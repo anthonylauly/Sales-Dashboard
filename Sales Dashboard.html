@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<!-- saved from url=(0055)file:///C:/Users/antho/Downloads/sales_dashboard_1.html -->
+<html lang="id"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Dashboard</title>
+<link href="./Sales Dashboard_files/css2" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f2f7;
+    --sidebar-bg: #ffffff;
+    --card-bg: #ffffff;
+    --primary: #2563eb;
+    --primary-light: #eff6ff;
+    --accent-green: #16a34a;
+    --accent-green-light: #dcfce7;
+    --accent-orange: #ea580c;
+    --accent-orange-light: #fff7ed;
+    --accent-red: #dc2626;
+    --accent-yellow: #ca8a04;
+    --text-1: #0f172a;
+    --text-2: #475569;
+    --text-3: #94a3b8;
+    --border: #e2e8f0;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-1);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    font-size: 13px;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 200px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--primary);
+    border-radius: 8px;
+    display: grid; place-items: center;
+    color: #fff;
+    font-size: 16px;
+  }
+
+  .logo span {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-1);
+  }
+
+  .nav { padding: 12px 10px; flex: 1; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--text-2);
+    font-weight: 500;
+    font-size: 13px;
+    transition: all .15s;
+    margin-bottom: 2px;
+  }
+
+  .nav-item:hover { background: var(--bg); color: var(--text-1); }
+
+  .nav-item.active {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .topbar-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-1);
+    flex: 1;
+  }
+
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .filter-label { font-size: 11px; color: var(--text-3); font-weight: 500; }
+
+  .filter-select {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-1);
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    min-width: 100px;
+  }
+
+  .filter-select svg { width: 12px; height: 12px; color: var(--text-3); }
+
+  .user-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 5px 10px 5px 5px;
+    margin-left: 8px;
+  }
+
+  .avatar {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    display: grid; place-items: center;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .user-info .name { font-size: 12px; font-weight: 600; line-height: 1.2; }
+  .user-info .role { font-size: 10px; color: var(--text-3); }
+
+  /* CONTENT */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 20px;
+  }
+
+  .content::-webkit-scrollbar { width: 6px; }
+  .content::-webkit-scrollbar-track { background: transparent; }
+  .content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-1);
+  }
+
+  .section-title span {
+    font-weight: 400;
+    color: var(--text-3);
+    font-size: 12px;
+    margin-left: 4px;
+  }
+
+  .last-updated {
+    font-size: 11px;
+    color: var(--text-3);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1.3fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .kpi-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .kpi-card.highlight {
+    background: #fff;
+    border: 1.5px solid var(--primary);
+  }
+
+  .kpi-icon {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    display: grid; place-items: center;
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+
+  .kpi-label { font-size: 11px; color: var(--text-2); font-weight: 500; margin-bottom: 4px; }
+  .kpi-label small { display: block; font-size: 10px; color: var(--text-3); font-weight: 400; }
+
+  .kpi-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-1);
+    line-height: 1.2;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: -0.3px;
+  }
+
+  .kpi-card.highlight .kpi-value { font-size: 20px; color: var(--primary); }
+
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 4px;
+  }
+
+  .kpi-sub.green { color: var(--accent-green); font-weight: 600; }
+  .kpi-sub.green-big { color: var(--accent-green); font-size: 14px; font-weight: 700; }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width .6s ease;
+  }
+
+  /* 3-COL GRID */
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  /* 2-COL GRID */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  /* GRID 2+1 */
+  .grid-21 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-1);
+    margin-bottom: 12px;
+  }
+
+  .card-title span { font-weight: 400; color: var(--text-3); font-size: 11px; }
+
+  /* GAP REVENUE */
+  .gauge-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .gauge-svg { flex-shrink: 0; }
+
+  .gauge-info { flex: 1; }
+  .gauge-value {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+  }
+
+  .gauge-sublabel { font-size: 11px; color: var(--text-3); margin-bottom: 10px; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .badge.green { background: var(--accent-green-light); color: var(--accent-green); }
+  .badge.blue { background: var(--primary-light); color: var(--primary); }
+
+  .coverage-pct {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--accent-green);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .coverage-label { font-size: 12px; color: var(--text-2); font-weight: 500; margin-bottom: 6px; }
+
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text-2); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; }
+
+  th {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-align: left;
+    padding: 0 8px 8px 0;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  td {
+    font-size: 11px;
+    color: var(--text-1);
+    padding: 8px 8px 8px 0;
+    border-bottom: 1px solid var(--bg);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  .stage-badge {
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .stage-proposal { background: #eff6ff; color: #2563eb; }
+  .stage-negotiation { background: #fef3c7; color: #d97706; }
+  .stage-qualification { background: #f0fdf4; color: #16a34a; }
+
+  .see-all {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  /* DONUT CHART */
+  .donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .donut-legend { flex: 1; }
+  .donut-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 11px;
+  }
+
+  .donut-legend-item .color-block {
+    width: 10px; height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .donut-legend-item .dl-label { color: var(--text-2); font-weight: 500; }
+  .donut-legend-item .dl-value { color: var(--text-1); font-weight: 700; font-family: 'DM Mono', monospace; font-size: 12px; }
+  .donut-legend-item .dl-pct { color: var(--text-3); font-size: 10px; }
+
+  /* SUMMARY GRID */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .summary-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+
+  .summary-item-label { font-size: 10px; color: var(--text-3); font-weight: 500; margin-bottom: 4px; line-height: 1.3; }
+  .summary-item-value { font-size: 18px; font-weight: 800; font-family: 'DM Mono', monospace; letter-spacing: -0.5px; }
+  .summary-item-sub { font-size: 10px; color: var(--text-3); margin-top: 2px; }
+
+  /* BAR CHART */
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 24px;
+    height: 140px;
+    padding-top: 10px;
+    position: relative;
+  }
+
+  .bar-group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar-label { font-size: 10px; color: var(--text-3); text-align: center; }
+
+  .bar {
+    width: 56px;
+    border-radius: 6px 6px 0 0;
+    position: relative;
+    transition: height .6s ease;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 4px;
+  }
+
+  .bar-val {
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .bar-val.above {
+    color: var(--primary);
+    position: absolute;
+    top: -18px;
+    font-size: 11px;
+  }
+
+  .chart-grid {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    padding-top: 4px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* SEARCH PIPELINE */
+  .search-box {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .search-input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--text-1);
+    background: var(--bg);
+    outline: none;
+  }
+
+  .search-input:focus { border-color: var(--primary); background: #fff; }
+
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .result-card {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .result-id { font-size: 12px; font-weight: 700; color: var(--text-1); }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 10px;
+    margin-bottom: 10px;
+  }
+
+  .result-row { font-size: 10px; }
+  .result-row .rl { color: var(--text-3); }
+  .result-row .rv { color: var(--text-1); font-weight: 600; }
+
+  .pipeline-stages {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-top: 8px;
+  }
+
+  .stage-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .stage-circle {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--border);
+    display: grid; place-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .stage-circle.done { background: var(--accent-green); color: #fff; }
+  .stage-circle.active { background: var(--primary); color: #fff; }
+
+  .stage-name { font-size: 9px; color: var(--text-3); text-align: center; }
+
+  .stage-line {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    margin-bottom: 16px;
+  }
+
+  .stage-line.done { background: var(--accent-green); }
+
+  /* PERFORMANCE TABLES */
+  .perf-table th { font-size: 10px; }
+  .perf-table td { font-size: 11px; }
+
+  .coverage-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 4px;
+  }
+
+  /* CHART LEGEND */
+  .chart-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 10px;
+  }
+
+  .chart-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-2);
+  }
+
+  .legend-line {
+    width: 16px;
+    height: 3px;
+    border-radius: 2px;
+  }
+
+  .legend-rect {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">✦</div>
+    <span>Sales Dashboard</span>
+  </div>
+  <nav class="nav">
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+      Overview
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+      Opportunity
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+      New Sales Deals
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+      Forecast
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+      Reports
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      Search Pipeline
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"></path></svg>
+      Settings
+    </div>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-title">Overview <span style="color:var(--text-3);font-weight:400;font-size:13px;">— Mei 2026</span></div>
+
+    <div class="filter-group">
+      <span class="filter-label">Periode</span>
+      <button class="filter-select">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        Mei 2026
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+    </div>
+
+    <div class="filter-group">
+      <span class="filter-label">Function</span>
+      <button class="filter-select">F&amp;G <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+    </div>
+
+    <div class="filter-group">
+      <span class="filter-label">Sales Person</span>
+      <button class="filter-select">All <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+    </div>
+
+    <div class="user-pill">
+      <div class="avatar">BS</div>
+      <div class="user-info">
+        <div class="name">Budi Santoso</div>
+        <div class="role">Sales Executive</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <div class="section-header">
+      <div class="section-title">Revenue Forecast <span>(Mei 2024)</span></div>
+      <div class="last-updated">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-4.95"></path></svg>
+        Last updated: 10 menit yang lalu
+      </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:#eff6ff;">🎯</div>
+        <div class="kpi-label">Target Revenue</div>
+        <div class="kpi-value">Rp 10.000.000.000</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--primary);"></div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:#f0fdf4;">💰</div>
+        <div class="kpi-label">Actual Revenue</div>
+        <div class="kpi-value">Rp 4.200.000.000</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:42%;background:var(--accent-green);"></div></div>
+        <div class="kpi-sub">42% dari Target</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:#fdf4ff;">✨</div>
+        <div class="kpi-label">New Deals Impact <small>(Current Month)</small></div>
+        <div class="kpi-value">Rp 1.800.000.000</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:18%;background:#a855f7;"></div></div>
+        <div class="kpi-sub">18% dari Target</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:#fff7ed;">🔗</div>
+        <div class="kpi-label">Estimasi Opportunity <small>(RFS Date This Month)</small></div>
+        <div class="kpi-value">Rp 4.500.000.000</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:45%;background:var(--accent-orange);"></div></div>
+        <div class="kpi-sub">45% dari Target</div>
+      </div>
+      <div class="kpi-card highlight">
+        <div class="kpi-label" style="font-size:10px;color:var(--text-3);margin-bottom:6px;">Total Forecast (Actual + New Impact + Est. Pipeline)</div>
+        <div class="kpi-value">Rp 10.500.000.000</div>
+        <div class="kpi-sub green-big" style="margin-top:6px;">105% dari Target</div>
+      </div>
+    </div>
+
+    <!-- ROW 2: Gap Revenue | Pipeline Closing | Delivery Status -->
+    <div class="grid-3">
+
+      <!-- Gap Revenue -->
+      <div class="card">
+        <div class="card-title">Gap Revenue &amp; Coverage</div>
+        <div class="gauge-wrap">
+          <!-- SVG Gauge -->
+          <svg class="gauge-svg" width="130" height="80" viewBox="0 0 130 80">
+            <!-- Background arc -->
+            <path d="M 15 75 A 50 50 0 0 1 115 75" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round"></path>
+            <!-- Red zone (gap) -->
+            <path d="M 15 75 A 50 50 0 0 1 65 25" fill="none" stroke="#ef4444" stroke-width="12" stroke-linecap="round"></path>
+            <!-- Orange zone -->
+            <path d="M 65 25 A 50 50 0 0 1 100 37" fill="none" stroke="#f97316" stroke-width="12" stroke-linecap="round"></path>
+            <!-- Green zone (surplus) -->
+            <path d="M 100 37 A 50 50 0 0 1 115 75" fill="none" stroke="#22c55e" stroke-width="12" stroke-linecap="round"></path>
+            <!-- Needle -->
+            <line x1="65" y1="75" x2="100" y2="38" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"></line>
+            <circle cx="65" cy="75" r="5" fill="#1e293b"></circle>
+            <!-- Center label -->
+            <text x="65" y="68" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="DM Sans">Rp 1.300.000.000</text>
+          </svg>
+          <div class="gauge-info">
+            <div class="coverage-pct">105%</div>
+            <div class="coverage-label">Coverage</div>
+            <div class="badge green">Pipeline Mencukupi</div>
+            <div style="font-size:10px;color:var(--text-3);margin-top:6px;">Forecast melebihi target</div>
+          </div>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><div class="dot" style="background:#ef4444;"></div>Gap: Rp 1.300.000.000</div>
+          <div class="legend-item"><div class="dot" style="background:#22c55e;"></div>Surplus: Rp 500.000.000</div>
+        </div>
+      </div>
+
+      <!-- Pipeline Closing Soon -->
+      <div class="card">
+        <div class="card-title">Pipeline Closing Soon</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Pipeline</th>
+              <th>Account</th>
+              <th>RFS Date</th>
+              <th>Est. Value</th>
+              <th>Prob.</th>
+              <th>Stage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0012</td>
+              <td>PT. Maju Bersama</td>
+              <td style="color:var(--text-3);white-space:nowrap;">10 Mei 2024</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 800.000.000</td>
+              <td style="color:var(--accent-green);font-weight:700;">90%</td>
+              <td><span class="stage-badge stage-proposal">Proposal</span></td>
+            </tr>
+            <tr>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0008</td>
+              <td>PT. Sukses Abadi</td>
+              <td style="color:var(--text-3);white-space:nowrap;">15 Mei 2024</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 650.000.000</td>
+              <td style="color:var(--accent-green);font-weight:700;">80%</td>
+              <td><span class="stage-badge stage-negotiation">Negotiation</span></td>
+            </tr>
+            <tr>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0015</td>
+              <td>PT. Global Solusi</td>
+              <td style="color:var(--text-3);white-space:nowrap;">20 Mei 2024</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 500.000.000</td>
+              <td style="color:var(--accent-yellow);font-weight:700;">70%</td>
+              <td><span class="stage-badge stage-proposal">Proposal</span></td>
+            </tr>
+            <tr>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0019</td>
+              <td>PT. Prima Teknologi</td>
+              <td style="color:var(--text-3);white-space:nowrap;">28 Mei 2024</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 450.000.000</td>
+              <td style="color:var(--text-2);font-weight:700;">60%</td>
+              <td><span class="stage-badge stage-qualification">Qualification</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="see-all">Lihat semua pipeline <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+      </div>
+
+      <!-- Delivery Status -->
+      <div class="card">
+        <div class="card-title">New Sales Deals – Delivery Status <span>(Mei 2024)</span></div>
+        <div class="donut-wrap">
+          <!-- Donut SVG -->
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle cx="55" cy="55" r="40" fill="none" stroke="#e2e8f0" stroke-width="18"></circle>
+            <!-- Delivered 60% → circumference of r=40 ≈ 251.3; 60% = 150.8 -->
+            <circle cx="55" cy="55" r="40" fill="none" stroke="#f97316" stroke-width="18" stroke-dasharray="150.8 251.3" stroke-dashoffset="0" transform="rotate(-90 55 55)"></circle>
+            <!-- On Progress 40% → 100.5 -->
+            <circle cx="55" cy="55" r="40" fill="none" stroke="#2563eb" stroke-width="18" stroke-dasharray="100.5 251.3" stroke-dashoffset="-150.8" transform="rotate(-90 55 55)"></circle>
+            <text x="55" y="49" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="DM Sans">Total Value</text>
+            <text x="55" y="60" text-anchor="middle" font-size="9" font-weight="700" fill="#0f172a" font-family="DM Mono">Rp 6.000.000</text>
+            <text x="55" y="70" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="DM Sans">.000</text>
+          </svg>
+          <div class="donut-legend">
+            <div class="donut-legend-item">
+              <div class="color-block" style="background:#2563eb;"></div>
+              <div>
+                <div class="dl-label">On Progress</div>
+                <div class="dl-value">Rp 2.400.000.000</div>
+                <div class="dl-pct">(40%)</div>
+              </div>
+            </div>
+            <div class="donut-legend-item">
+              <div class="color-block" style="background:#f97316;"></div>
+              <div>
+                <div class="dl-label">Delivered</div>
+                <div class="dl-value">Rp 3.600.000.000</div>
+                <div class="dl-pct">(60%)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="see-all" style="margin-top:10px;">Lihat detail <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+      </div>
+    </div>
+
+    <!-- ROW 3: Summary | Bar Chart | Search Pipeline -->
+    <div class="grid-21">
+
+      <!-- New Sales Deals Summary -->
+      <div class="card">
+        <div class="card-title">New Sales Deals Summary <span>(Mei 2024)</span></div>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <div class="summary-item-label">New Sales Deals (On Progress)</div>
+            <div class="summary-item-value" style="color:var(--primary);">12 <span style="font-size:13px;font-family:&#39;DM Sans&#39;">Deals</span></div>
+            <div class="summary-item-sub">Rp 2.400.000.000</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item-label">Deals Delivered – Belum First Bill</div>
+            <div class="summary-item-value" style="color:var(--accent-orange);">7 <span style="font-size:13px;font-family:&#39;DM Sans&#39;">Deals</span></div>
+            <div class="summary-item-sub">Rp 1.700.000.000</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item-label">Deals Delivered – Sudah First Bill</div>
+            <div class="summary-item-value" style="color:var(--accent-green);">9 <span style="font-size:13px;font-family:&#39;DM Sans&#39;">Deals</span></div>
+            <div class="summary-item-sub">Rp 1.900.000.000</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item-label">Total Deals Delivered</div>
+            <div class="summary-item-value" style="color:var(--text-1);">16 <span style="font-size:13px;font-family:&#39;DM Sans&#39;">Deals</span></div>
+            <div class="summary-item-sub">Rp 3.600.000.000</div>
+          </div>
+        </div>
+        <div class="see-all" style="margin-top:10px;">Lihat semua <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+      </div>
+
+      <!-- Pipeline Estimasi vs Target (Bar Chart) -->
+      <div class="card">
+        <div class="card-title">Pipeline Estimasi vs Target</div>
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div style="flex:1;">
+            <div style="font-size:10px;color:var(--text-3);margin-bottom:4px;">(Rp Miliar)</div>
+            <!-- Y-axis labels + chart -->
+            <div style="display:flex;gap:6px;align-items:flex-end;">
+              <div style="display:flex;flex-direction:column;justify-content:space-between;height:120px;font-size:9px;color:var(--text-3);text-align:right;padding-bottom:2px;">
+                <span>15.0</span><span>12.5</span><span>10.0</span><span>7.5</span><span>5.0</span><span>2.5</span><span>0</span>
+              </div>
+              <div style="flex:1;position:relative;">
+                <!-- Grid lines -->
+                <div style="position:absolute;top:0;left:0;right:0;bottom:0;">
+                  <div style="height:100%;display:flex;flex-direction:column;justify-content:space-between;">
+                    <div style="border-bottom:1px dashed #e2e8f0;flex:1;"></div>
+                    <div style="border-bottom:1px dashed #e2e8f0;flex:1;"></div>
+                    <div style="border-bottom:1px dashed #e2e8f0;flex:1;"></div>
+                    <div style="border-bottom:1px dashed #e2e8f0;flex:1;"></div>
+                    <div style="border-bottom:1px dashed #e2e8f0;flex:1;"></div>
+                    <div style="border-bottom:1px solid #e2e8f0;flex:1;"></div>
+                  </div>
+                </div>
+                <div class="bar-chart" style="position:relative;z-index:1;">
+                  <!-- Target line (10.0) -->
+                  <div style="position:absolute;left:0;right:0;bottom:calc((10/15)*100%);border-top:2px dashed #8b5cf6;z-index:2;"></div>
+
+                  <div class="bar-group">
+                    <div class="bar" style="height:calc((4.2/15)*140px);background:var(--accent-green);">
+                      <span class="bar-val">4.2</span>
+                    </div>
+                    <div class="bar-label">Actual</div>
+                  </div>
+
+                  <div class="bar-group">
+                    <!-- Pipeline Estimasi stacked-ish -->
+                    <div style="position:relative;">
+                      <div class="bar" style="height:calc((4.5/15)*140px);background:var(--accent-orange);width:56px;border-radius:0;">
+                      </div>
+                      <div style="position:absolute;top:0;left:0;right:0;height:calc((4.2/15)*140px);background:#fbbf24;border-radius:0;bottom:0;top:auto;"></div>
+                      <div style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);background:#2563eb;color:#fff;border-radius:20px;padding:2px 7px;font-size:10px;font-weight:700;white-space:nowrap;">10.0</div>
+                    </div>
+                    <div class="bar-label">Pipeline Estimasi<br>(RFS This Month)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="chart-legend" style="margin-top:20px;">
+            <div class="chart-legend-item"><div class="legend-line" style="background:#8b5cf6;border-top:2px dashed #8b5cf6;height:0;"></div>Target Revenue</div>
+            <div class="chart-legend-item"><div class="legend-rect" style="background:var(--border);"></div>Gap</div>
+            <div class="chart-legend-item"><div class="legend-rect" style="background:var(--accent-orange);"></div>Estimasi Pipeline</div>
+            <div class="chart-legend-item"><div class="legend-rect" style="background:var(--accent-green);"></div>Actual Revenue</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Pipeline -->
+      <div class="card">
+        <div class="card-title">Search Pipeline</div>
+        <div class="search-box">
+          <input type="text" class="search-input" value="PL-2405-0012" placeholder="Cari pipeline...">
+          <button class="btn-primary">Search</button>
+        </div>
+        <div class="result-card">
+          <div class="result-header">
+            <span class="result-id">PL-2405-0012 – PT. Maju Bersama</span>
+            <span class="stage-badge stage-proposal">Proposal</span>
+          </div>
+          <div class="result-grid">
+            <div class="result-row"><span class="rl">Account </span><span class="rv">PT. Maju Bersama</span></div>
+            <div class="result-row"><span class="rl">Est. Value </span><span class="rv">Rp 800.000.000</span></div>
+            <div class="result-row"><span class="rl">Sales Person </span><span class="rv">Budi Santoso</span></div>
+            <div class="result-row"><span class="rl">Probability </span><span class="rv" style="color:var(--accent-green);">90%</span></div>
+            <div class="result-row"><span class="rl">Function </span><span class="rv">Commercial</span></div>
+            <div class="result-row"><span class="rl">Source </span><span class="rv">Referral</span></div>
+            <div class="result-row"><span class="rl">RFS Date </span><span class="rv">10 Mei 2024</span></div>
+            <div class="result-row"><span class="rl">Created Date </span><span class="rv">2 Mei 2024</span></div>
+          </div>
+          <div style="font-size:11px;font-weight:600;color:var(--text-1);margin-bottom:8px;">Staging / Pipeline Status</div>
+          <div class="pipeline-stages">
+            <div class="stage-step">
+              <div class="stage-circle done">✓</div>
+              <div class="stage-name">Qualification</div>
+            </div>
+            <div class="stage-line done"></div>
+            <div class="stage-step">
+              <div class="stage-circle done">✓</div>
+              <div class="stage-name">Need Analysis</div>
+            </div>
+            <div class="stage-line done"></div>
+            <div class="stage-step">
+              <div class="stage-circle active">3</div>
+              <div class="stage-name">Proposal</div>
+            </div>
+            <div class="stage-line"></div>
+            <div class="stage-step">
+              <div class="stage-circle">4</div>
+              <div class="stage-name">Negotiation</div>
+            </div>
+            <div class="stage-line"></div>
+            <div class="stage-step">
+              <div class="stage-circle">5</div>
+              <div class="stage-name">Closed Won</div>
+            </div>
+          </div>
+          <div class="see-all" style="margin-top:10px;">Lihat detail pipeline <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 4: Performance Tables + Top Pipeline -->
+    <div class="grid-21">
+
+      <!-- Performance per Function -->
+      <div class="card">
+        <div class="card-title">Performance per Function <span>(Mei 2024)</span></div>
+        <table class="perf-table">
+          <thead>
+            <tr>
+              <th>Function</th>
+              <th>Target (Rp)</th>
+              <th>Actual (Rp)</th>
+              <th>Forecast (Rp)</th>
+              <th>Coverage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">Commercial</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">6.000.000.000</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.600.000.000</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">6.400.000.000</td>
+              <td style="font-weight:700;">107% <span class="coverage-dot" style="background:#22c55e;"></span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Public Sector</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.500.000.000</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">1.000.000.000</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.200.000.000</td>
+              <td style="font-weight:700;">88% <span class="coverage-dot" style="background:#f59e0b;"></span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Enterprise</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">1.500.000.000</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">600.000.000</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">1.900.000.000</td>
+              <td style="font-weight:700;">127% <span class="coverage-dot" style="background:#22c55e;"></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Performance per Sales Person -->
+      <div class="card">
+        <div class="card-title">Performance per Sales Person <span>(Mei 2024)</span></div>
+        <table class="perf-table">
+          <thead>
+            <tr>
+              <th>Sales Person</th>
+              <th>Target (Rp)</th>
+              <th>Actual (Rp)</th>
+              <th>Forecast (Rp)</th>
+              <th>Coverage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">Budi Santoso</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">3.000.000.000</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">1.300.000.000</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">3.100.000.000</td>
+              <td style="font-weight:700;">103% <span class="coverage-dot" style="background:#22c55e;"></span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Siti Rahayu</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.500.000.000</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">1.100.000.000</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.600.000.000</td>
+              <td style="font-weight:700;">104% <span class="coverage-dot" style="background:#22c55e;"></span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Andi Wijaya</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.000.000.000</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">800.000.000</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">1.900.000.000</td>
+              <td style="font-weight:700;">95% <span class="coverage-dot" style="background:#f59e0b;"></span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Dewi Lestari</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.500.000.000</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">1.000.000.000</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.900.000.000</td>
+              <td style="font-weight:700;">116% <span class="coverage-dot" style="background:#22c55e;"></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Top Pipeline by Value -->
+      <div class="card">
+        <div class="card-title">Top Pipeline by Value <span>(RFS This Month)</span></div>
+        <table class="perf-table">
+          <thead>
+            <tr>
+              <th>Pipeline</th>
+              <th>Account</th>
+              <th>RFS Date</th>
+              <th>Est. Value</th>
+              <th>Prob.</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0012</td>
+              <td>PT. Maju Bersama</td>
+              <td style="color:var(--text-3);font-size:10px;">10 Mei 2024</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 800.000.000</td>
+              <td style="color:var(--accent-green);font-weight:700;">90%</td>
+            </tr>
+            <tr>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0008</td>
+              <td>PT. Sukses Abadi</td>
+              <td style="color:var(--text-3);font-size:10px;">15 Mei 2024</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 650.000.000</td>
+              <td style="color:var(--accent-green);font-weight:700;">80%</td>
+            </tr>
+            <tr>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0015</td>
+              <td>PT. Global Solusi</td>
+              <td style="color:var(--text-3);font-size:10px;">20 Mei 2024</td>
+              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 500.000.000</td>
+              <td style="color:var(--accent-yellow);font-weight:700;">70%</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="see-all" style="margin-top:10px;">Lihat semua <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+
+</body></html>
