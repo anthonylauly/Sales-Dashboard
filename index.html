@@ -4,7 +4,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sales Dashboard</title>
-<link href="./Sales Dashboard_files/css2" rel="stylesheet">
+<link href="./sales_dashboard_1_files/css2" rel="stylesheet">
 <style>
   :root {
     --bg: #f0f2f7;
@@ -48,6 +48,53 @@
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
+    transition: transform .25s ease;
+    z-index: 100;
+  }
+
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 99;
+  }
+
+  .sidebar-overlay.open { display: block; }
+
+  .hamburger {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--text-1);
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      transform: translateX(-100%);
+    }
+    .sidebar.open {
+      transform: translateX(0);
+      box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+    }
+    .hamburger { display: flex; }
+    .kpi-grid { grid-template-columns: 1fr 1fr !important; }
+    .kpi-grid > .kpi-card:last-child { grid-column: span 2; }
+    .grid-3, .grid-2, .grid-21 { grid-template-columns: 1fr !important; }
+    .content { padding: 14px 12px; }
+  }
+
+  @media (max-width: 480px) {
+    .kpi-grid { grid-template-columns: 1fr !important; }
+    .kpi-grid > .kpi-card:last-child { grid-column: span 1; }
+    .summary-grid { grid-template-columns: 1fr !important; }
+    .result-grid { grid-template-columns: 1fr !important; }
   }
 
   .logo {
@@ -332,8 +379,8 @@
   .gauge-value {
     font-size: 18px;
     font-weight: 700;
-    font-family: 'DM Mono', monospace;
-    letter-spacing: -0.5px;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: -0.3px;
     line-height: 1.2;
   }
 
@@ -451,7 +498,7 @@
   }
 
   .summary-item-label { font-size: 10px; color: var(--text-3); font-weight: 500; margin-bottom: 4px; line-height: 1.3; }
-  .summary-item-value { font-size: 18px; font-weight: 800; font-family: 'DM Mono', monospace; letter-spacing: -0.5px; }
+  .summary-item-value { font-size: 18px; font-weight: 800; font-family: 'DM Sans', sans-serif; letter-spacing: -0.3px; }
   .summary-item-sub { font-size: 10px; color: var(--text-3); margin-top: 2px; }
 
   /* BAR CHART */
@@ -641,8 +688,11 @@
 </head>
 <body>
 
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
 <!-- SIDEBAR -->
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
   <div class="logo">
     <div class="logo-icon">✦</div>
     <span>Sales Dashboard</span>
@@ -684,6 +734,9 @@
 
   <!-- TOPBAR -->
   <header class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
     <div class="topbar-title">Overview <span style="color:var(--text-3);font-weight:400;font-size:13px;">— Mei 2026</span></div>
 
     <div class="filter-group">
@@ -718,7 +771,7 @@
   <div class="content">
 
     <div class="section-header">
-      <div class="section-title">Revenue Forecast <span>(Mei 2024)</span></div>
+      <div class="section-title">Revenue Forecast <span>(Mei 2026)</span></div>
       <div class="last-updated">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-4.95"></path></svg>
         Last updated: 10 menit yang lalu
@@ -749,15 +802,15 @@
       </div>
       <div class="kpi-card">
         <div class="kpi-icon" style="background:#fff7ed;">🔗</div>
-        <div class="kpi-label">Estimasi Opportunity <small>(RFS Date This Month)</small></div>
+        <div class="kpi-label">Estimasi Pipeline <small>(RFS Date This Month)</small></div>
         <div class="kpi-value">Rp 4.500.000.000</div>
         <div class="progress-bar"><div class="progress-fill" style="width:45%;background:var(--accent-orange);"></div></div>
         <div class="kpi-sub">45% dari Target</div>
       </div>
       <div class="kpi-card highlight">
-        <div class="kpi-label" style="font-size:10px;color:var(--text-3);margin-bottom:6px;">Total Forecast (Actual + New Impact + Est. Pipeline)</div>
-        <div class="kpi-value">Rp 10.500.000.000</div>
-        <div class="kpi-sub green-big" style="margin-top:6px;">105% dari Target</div>
+        <div class="kpi-label" style="font-size:10px;color:var(--text-3);margin-bottom:6px;">Total Forecast (Actual + New Deals + Est. Pipeline + Est. Churn)</div>
+        <div class="kpi-value">Rp 10.300.000.000</div>
+        <div class="kpi-sub green-big" style="margin-top:6px;">103% dari Target</div>
       </div>
     </div>
 
@@ -785,7 +838,7 @@
             <text x="65" y="68" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="DM Sans">Rp 1.300.000.000</text>
           </svg>
           <div class="gauge-info">
-            <div class="coverage-pct">105%</div>
+            <div class="coverage-pct">103%</div>
             <div class="coverage-label">Coverage</div>
             <div class="badge green">Pipeline Mencukupi</div>
             <div style="font-size:10px;color:var(--text-3);margin-top:6px;">Forecast melebihi target</div>
@@ -815,7 +868,7 @@
             <tr>
               <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0012</td>
               <td>PT. Maju Bersama</td>
-              <td style="color:var(--text-3);white-space:nowrap;">10 Mei 2024</td>
+              <td style="color:var(--text-3);white-space:nowrap;">10 Mei 2026</td>
               <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 800.000.000</td>
               <td style="color:var(--accent-green);font-weight:700;">90%</td>
               <td><span class="stage-badge stage-proposal">Proposal</span></td>
@@ -823,7 +876,7 @@
             <tr>
               <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0008</td>
               <td>PT. Sukses Abadi</td>
-              <td style="color:var(--text-3);white-space:nowrap;">15 Mei 2024</td>
+              <td style="color:var(--text-3);white-space:nowrap;">15 Mei 2026</td>
               <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 650.000.000</td>
               <td style="color:var(--accent-green);font-weight:700;">80%</td>
               <td><span class="stage-badge stage-negotiation">Negotiation</span></td>
@@ -831,7 +884,7 @@
             <tr>
               <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0015</td>
               <td>PT. Global Solusi</td>
-              <td style="color:var(--text-3);white-space:nowrap;">20 Mei 2024</td>
+              <td style="color:var(--text-3);white-space:nowrap;">20 Mei 2026</td>
               <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 500.000.000</td>
               <td style="color:var(--accent-yellow);font-weight:700;">70%</td>
               <td><span class="stage-badge stage-proposal">Proposal</span></td>
@@ -839,7 +892,7 @@
             <tr>
               <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0019</td>
               <td>PT. Prima Teknologi</td>
-              <td style="color:var(--text-3);white-space:nowrap;">28 Mei 2024</td>
+              <td style="color:var(--text-3);white-space:nowrap;">28 Mei 2026</td>
               <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 450.000.000</td>
               <td style="color:var(--text-2);font-weight:700;">60%</td>
               <td><span class="stage-badge stage-qualification">Qualification</span></td>
@@ -851,7 +904,7 @@
 
       <!-- Delivery Status -->
       <div class="card">
-        <div class="card-title">New Sales Deals – Delivery Status <span>(Mei 2024)</span></div>
+        <div class="card-title">New Sales Deals – Delivery Status <span>(Mei 2026)</span></div>
         <div class="donut-wrap">
           <!-- Donut SVG -->
           <svg width="110" height="110" viewBox="0 0 110 110">
@@ -861,7 +914,7 @@
             <!-- On Progress 40% → 100.5 -->
             <circle cx="55" cy="55" r="40" fill="none" stroke="#2563eb" stroke-width="18" stroke-dasharray="100.5 251.3" stroke-dashoffset="-150.8" transform="rotate(-90 55 55)"></circle>
             <text x="55" y="49" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="DM Sans">Total Value</text>
-            <text x="55" y="60" text-anchor="middle" font-size="9" font-weight="700" fill="#0f172a" font-family="DM Mono">Rp 6.000.000</text>
+            <text x="55" y="60" text-anchor="middle" font-size="9" font-weight="700" fill="#0f172a" font-family="DM Sans">Rp 1.800.000</text>
             <text x="55" y="70" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="DM Sans">.000</text>
           </svg>
           <div class="donut-legend">
@@ -869,7 +922,7 @@
               <div class="color-block" style="background:#2563eb;"></div>
               <div>
                 <div class="dl-label">On Progress</div>
-                <div class="dl-value">Rp 2.400.000.000</div>
+                <div class="dl-value">Rp 720.000.000</div>
                 <div class="dl-pct">(40%)</div>
               </div>
             </div>
@@ -877,7 +930,7 @@
               <div class="color-block" style="background:#f97316;"></div>
               <div>
                 <div class="dl-label">Delivered</div>
-                <div class="dl-value">Rp 3.600.000.000</div>
+                <div class="dl-value">Rp 1.080.000.000</div>
                 <div class="dl-pct">(60%)</div>
               </div>
             </div>
@@ -892,7 +945,7 @@
 
       <!-- New Sales Deals Summary -->
       <div class="card">
-        <div class="card-title">New Sales Deals Summary <span>(Mei 2024)</span></div>
+        <div class="card-title">New Sales Deals Summary <span>(Mei 2026)</span></div>
         <div class="summary-grid">
           <div class="summary-item">
             <div class="summary-item-label">New Sales Deals (On Progress)</div>
@@ -920,7 +973,7 @@
 
       <!-- Pipeline Estimasi vs Target (Bar Chart) -->
       <div class="card">
-        <div class="card-title">Pipeline Estimasi vs Target</div>
+        <div class="card-title">Actual Revenue, Est. Pipeline vs Target</div>
         <div style="display:flex;gap:12px;align-items:flex-start;">
           <div style="flex:1;">
             <div style="font-size:10px;color:var(--text-3);margin-bottom:4px;">(Rp Miliar)</div>
@@ -992,10 +1045,10 @@
             <div class="result-row"><span class="rl">Est. Value </span><span class="rv">Rp 800.000.000</span></div>
             <div class="result-row"><span class="rl">Sales Person </span><span class="rv">Budi Santoso</span></div>
             <div class="result-row"><span class="rl">Probability </span><span class="rv" style="color:var(--accent-green);">90%</span></div>
-            <div class="result-row"><span class="rl">Function </span><span class="rv">Commercial</span></div>
-            <div class="result-row"><span class="rl">Source </span><span class="rv">Referral</span></div>
-            <div class="result-row"><span class="rl">RFS Date </span><span class="rv">10 Mei 2024</span></div>
-            <div class="result-row"><span class="rl">Created Date </span><span class="rv">2 Mei 2024</span></div>
+            <div class="result-row"><span class="rl">Function </span><span class="rv">Financial &amp; Government</span></div>
+            <div class="result-row"><span class="rl">Source </span><span class="rv">Self Input</span></div>
+            <div class="result-row"><span class="rl">RFS Date </span><span class="rv">10 Mei 2026</span></div>
+            <div class="result-row"><span class="rl">Created Date </span><span class="rv">2 Mei 2026</span></div>
           </div>
           <div style="font-size:11px;font-weight:600;color:var(--text-1);margin-bottom:8px;">Staging / Pipeline Status</div>
           <div class="pipeline-stages">
@@ -1034,7 +1087,7 @@
 
       <!-- Performance per Function -->
       <div class="card">
-        <div class="card-title">Performance per Function <span>(Mei 2024)</span></div>
+        <div class="card-title">Performance per Function <span>(Mei 2026)</span></div>
         <table class="perf-table">
           <thead>
             <tr>
@@ -1073,7 +1126,7 @@
 
       <!-- Performance per Sales Person -->
       <div class="card">
-        <div class="card-title">Performance per Sales Person <span>(Mei 2024)</span></div>
+        <div class="card-title">Performance per Sales Person <span>(Mei 2026)</span></div>
         <table class="perf-table">
           <thead>
             <tr>
@@ -1134,21 +1187,21 @@
             <tr>
               <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0012</td>
               <td>PT. Maju Bersama</td>
-              <td style="color:var(--text-3);font-size:10px;">10 Mei 2024</td>
+              <td style="color:var(--text-3);font-size:10px;">10 Mei 2026</td>
               <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 800.000.000</td>
               <td style="color:var(--accent-green);font-weight:700;">90%</td>
             </tr>
             <tr>
               <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0008</td>
               <td>PT. Sukses Abadi</td>
-              <td style="color:var(--text-3);font-size:10px;">15 Mei 2024</td>
+              <td style="color:var(--text-3);font-size:10px;">15 Mei 2026</td>
               <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 650.000.000</td>
               <td style="color:var(--accent-green);font-weight:700;">80%</td>
             </tr>
             <tr>
               <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0015</td>
               <td>PT. Global Solusi</td>
-              <td style="color:var(--text-3);font-size:10px;">20 Mei 2024</td>
+              <td style="color:var(--text-3);font-size:10px;">20 Mei 2026</td>
               <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 500.000.000</td>
               <td style="color:var(--accent-yellow);font-weight:700;">70%</td>
             </tr>
@@ -1160,6 +1213,12 @@
 
   </div><!-- /content -->
 </div><!-- /main -->
+<script>
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('open');
+  }
+</script>
 
 
 </body></html>
