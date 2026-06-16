@@ -1,1224 +1,1323 @@
 <!DOCTYPE html>
-<!-- saved from url=(0055)file:///C:/Users/antho/Downloads/sales_dashboard_1.html -->
-<html lang="id"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sales Dashboard</title>
-<link href="./sales_dashboard_1_files/css2" rel="stylesheet">
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>IOH Pipeline & Upside Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-  :root {
-    --bg: #f0f2f7;
-    --sidebar-bg: #ffffff;
-    --card-bg: #ffffff;
-    --primary: #2563eb;
-    --primary-light: #eff6ff;
-    --accent-green: #16a34a;
-    --accent-green-light: #dcfce7;
-    --accent-orange: #ea580c;
-    --accent-orange-light: #fff7ed;
-    --accent-red: #dc2626;
-    --accent-yellow: #ca8a04;
-    --text-1: #0f172a;
-    --text-2: #475569;
-    --text-3: #94a3b8;
-    --border: #e2e8f0;
-    --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
-    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-    --radius: 12px;
-    --radius-sm: 8px;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text-1);
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
-    font-size: 13px;
-  }
-
-  /* ── SIDEBAR ── */
-  .sidebar {
-    width: 200px;
-    background: var(--sidebar-bg);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    transition: transform .25s ease;
-    z-index: 100;
-  }
-
-  .sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.35);
-    z-index: 99;
-  }
-
-  .sidebar-overlay.open { display: block; }
-
-  .hamburger {
-    display: none;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-    color: var(--text-1);
-    align-items: center;
-    justify-content: center;
-  }
-
-  @media (max-width: 768px) {
-    .sidebar {
-      position: fixed;
-      top: 0; left: 0; bottom: 0;
-      transform: translateX(-100%);
-    }
-    .sidebar.open {
-      transform: translateX(0);
-      box-shadow: 4px 0 24px rgba(0,0,0,0.12);
-    }
-    .hamburger { display: flex; }
-    .kpi-grid { grid-template-columns: 1fr 1fr !important; }
-    .kpi-grid > .kpi-card:last-child { grid-column: span 2; }
-    .grid-3, .grid-2, .grid-21 { grid-template-columns: 1fr !important; }
-    .content { padding: 14px 12px; }
-  }
-
-  @media (max-width: 480px) {
-    .kpi-grid { grid-template-columns: 1fr !important; }
-    .kpi-grid > .kpi-card:last-child { grid-column: span 1; }
-    .summary-grid { grid-template-columns: 1fr !important; }
-    .result-grid { grid-template-columns: 1fr !important; }
-  }
-
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 20px 18px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .logo-icon {
-    width: 32px; height: 32px;
-    background: var(--primary);
-    border-radius: 8px;
-    display: grid; place-items: center;
-    color: #fff;
-    font-size: 16px;
-  }
-
-  .logo span {
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--text-1);
-  }
-
-  .nav { padding: 12px 10px; flex: 1; }
-
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 10px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    color: var(--text-2);
-    font-weight: 500;
-    font-size: 13px;
-    transition: all .15s;
-    margin-bottom: 2px;
-  }
-
-  .nav-item:hover { background: var(--bg); color: var(--text-1); }
-
-  .nav-item.active {
-    background: var(--primary);
-    color: #fff;
-  }
-
-  .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
-
-  /* ── MAIN ── */
-  .main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  /* TOPBAR */
-  .topbar {
-    background: #fff;
-    border-bottom: 1px solid var(--border);
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
-  }
-
-  .topbar-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text-1);
-    flex: 1;
-  }
-
-  .filter-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .filter-label { font-size: 11px; color: var(--text-3); font-weight: 500; }
-
-  .filter-select {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 5px 10px;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-1);
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    min-width: 100px;
-  }
-
-  .filter-select svg { width: 12px; height: 12px; color: var(--text-3); }
-
-  .user-pill {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--bg);
-    border-radius: 10px;
-    padding: 5px 10px 5px 5px;
-    margin-left: 8px;
-  }
-
-  .avatar {
-    width: 28px; height: 28px;
-    border-radius: 7px;
-    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
-    display: grid; place-items: center;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-  }
-
-  .user-info .name { font-size: 12px; font-weight: 600; line-height: 1.2; }
-  .user-info .role { font-size: 10px; color: var(--text-3); }
-
-  /* CONTENT */
-  .content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 18px 20px;
-  }
-
-  .content::-webkit-scrollbar { width: 6px; }
-  .content::-webkit-scrollbar-track { background: transparent; }
-  .content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-
-  .section-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-1);
-  }
-
-  .section-title span {
-    font-weight: 400;
-    color: var(--text-3);
-    font-size: 12px;
-    margin-left: 4px;
-  }
-
-  .last-updated {
-    font-size: 11px;
-    color: var(--text-3);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  /* KPI CARDS */
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1.3fr;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-
-  .kpi-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    box-shadow: var(--shadow);
-  }
-
-  .kpi-card.highlight {
-    background: #fff;
-    border: 1.5px solid var(--primary);
-  }
-
-  .kpi-icon {
-    width: 34px; height: 34px;
-    border-radius: 8px;
-    display: grid; place-items: center;
-    margin-bottom: 10px;
-    font-size: 16px;
-  }
-
-  .kpi-label { font-size: 11px; color: var(--text-2); font-weight: 500; margin-bottom: 4px; }
-  .kpi-label small { display: block; font-size: 10px; color: var(--text-3); font-weight: 400; }
-
-  .kpi-value {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text-1);
-    line-height: 1.2;
-    font-family: 'DM Sans', sans-serif;
-    letter-spacing: -0.3px;
-  }
-
-  .kpi-card.highlight .kpi-value { font-size: 20px; color: var(--primary); }
-
-  .kpi-sub {
-    font-size: 11px;
-    color: var(--text-3);
-    margin-top: 4px;
-  }
-
-  .kpi-sub.green { color: var(--accent-green); font-weight: 600; }
-  .kpi-sub.green-big { color: var(--accent-green); font-size: 14px; font-weight: 700; }
-
-  .progress-bar {
-    height: 4px;
-    background: var(--border);
-    border-radius: 2px;
-    margin-top: 8px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width .6s ease;
-  }
-
-  /* 3-COL GRID */
-  .grid-3 {
-    display: grid;
-    grid-template-columns: 1fr 1.4fr 1fr;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-
-  /* 2-COL GRID */
-  .grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-
-  /* GRID 2+1 */
-  .grid-21 {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-
-  .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
-    box-shadow: var(--shadow);
-  }
-
-  .card-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-1);
-    margin-bottom: 12px;
-  }
-
-  .card-title span { font-weight: 400; color: var(--text-3); font-size: 11px; }
-
-  /* GAP REVENUE */
-  .gauge-wrap {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .gauge-svg { flex-shrink: 0; }
-
-  .gauge-info { flex: 1; }
-  .gauge-value {
-    font-size: 18px;
-    font-weight: 700;
-    font-family: 'DM Sans', sans-serif;
-    letter-spacing: -0.3px;
-    line-height: 1.2;
-  }
-
-  .gauge-sublabel { font-size: 11px; color: var(--text-3); margin-bottom: 10px; }
-
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-  }
-
-  .badge.green { background: var(--accent-green-light); color: var(--accent-green); }
-  .badge.blue { background: var(--primary-light); color: var(--primary); }
-
-  .coverage-pct {
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--accent-green);
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .coverage-label { font-size: 12px; color: var(--text-2); font-weight: 500; margin-bottom: 6px; }
-
-  .legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text-2); }
-  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
-  /* TABLE */
-  table { width: 100%; border-collapse: collapse; }
-
-  th {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-3);
-    text-align: left;
-    padding: 0 8px 8px 0;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-
-  td {
-    font-size: 11px;
-    color: var(--text-1);
-    padding: 8px 8px 8px 0;
-    border-bottom: 1px solid var(--bg);
-    vertical-align: middle;
-  }
-
-  tr:last-child td { border-bottom: none; }
-
-  .stage-badge {
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-size: 10px;
-    font-weight: 600;
-  }
-
-  .stage-proposal { background: #eff6ff; color: #2563eb; }
-  .stage-negotiation { background: #fef3c7; color: #d97706; }
-  .stage-qualification { background: #f0fdf4; color: #16a34a; }
-
-  .see-all {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    color: var(--primary);
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-
-  /* DONUT CHART */
-  .donut-wrap {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .donut-legend { flex: 1; }
-  .donut-legend-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-    font-size: 11px;
-  }
-
-  .donut-legend-item .color-block {
-    width: 10px; height: 10px;
-    border-radius: 3px;
-    flex-shrink: 0;
-  }
-
-  .donut-legend-item .dl-label { color: var(--text-2); font-weight: 500; }
-  .donut-legend-item .dl-value { color: var(--text-1); font-weight: 700; font-family: 'DM Mono', monospace; font-size: 12px; }
-  .donut-legend-item .dl-pct { color: var(--text-3); font-size: 10px; }
-
-  /* SUMMARY GRID */
-  .summary-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .summary-item {
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 12px;
-  }
-
-  .summary-item-label { font-size: 10px; color: var(--text-3); font-weight: 500; margin-bottom: 4px; line-height: 1.3; }
-  .summary-item-value { font-size: 18px; font-weight: 800; font-family: 'DM Sans', sans-serif; letter-spacing: -0.3px; }
-  .summary-item-sub { font-size: 10px; color: var(--text-3); margin-top: 2px; }
-
-  /* BAR CHART */
-  .bar-chart {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    gap: 24px;
-    height: 140px;
-    padding-top: 10px;
-    position: relative;
-  }
-
-  .bar-group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-  .bar-label { font-size: 10px; color: var(--text-3); text-align: center; }
-
-  .bar {
-    width: 56px;
-    border-radius: 6px 6px 0 0;
-    position: relative;
-    transition: height .6s ease;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding-top: 4px;
-  }
-
-  .bar-val {
-    font-size: 10px;
-    font-weight: 700;
-    color: #fff;
-    font-family: 'DM Mono', monospace;
-  }
-
-  .bar-val.above {
-    color: var(--primary);
-    position: absolute;
-    top: -18px;
-    font-size: 11px;
-  }
-
-  .chart-grid {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 6px;
-    padding-top: 4px;
-    border-top: 1px solid var(--border);
-  }
-
-  /* SEARCH PIPELINE */
-  .search-box {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 10px;
-  }
-
-  .search-input {
-    flex: 1;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 7px 12px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    color: var(--text-1);
-    background: var(--bg);
-    outline: none;
-  }
-
-  .search-input:focus { border-color: var(--primary); background: #fff; }
-
-  .btn-primary {
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 7px 14px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  .result-card {
-    background: var(--bg);
-    border-radius: var(--radius-sm);
-    padding: 12px;
-  }
-
-  .result-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-
-  .result-id { font-size: 12px; font-weight: 700; color: var(--text-1); }
-
-  .result-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px 10px;
-    margin-bottom: 10px;
-  }
-
-  .result-row { font-size: 10px; }
-  .result-row .rl { color: var(--text-3); }
-  .result-row .rv { color: var(--text-1); font-weight: 600; }
-
-  .pipeline-stages {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    margin-top: 8px;
-  }
-
-  .stage-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    flex: 1;
-  }
-
-  .stage-circle {
-    width: 24px; height: 24px;
-    border-radius: 50%;
-    background: var(--border);
-    display: grid; place-items: center;
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--text-3);
-    position: relative;
-    z-index: 1;
-  }
-
-  .stage-circle.done { background: var(--accent-green); color: #fff; }
-  .stage-circle.active { background: var(--primary); color: #fff; }
-
-  .stage-name { font-size: 9px; color: var(--text-3); text-align: center; }
-
-  .stage-line {
-    flex: 1;
-    height: 2px;
-    background: var(--border);
-    margin-bottom: 16px;
-  }
-
-  .stage-line.done { background: var(--accent-green); }
-
-  /* PERFORMANCE TABLES */
-  .perf-table th { font-size: 10px; }
-  .perf-table td { font-size: 11px; }
-
-  .coverage-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-left: 4px;
-  }
-
-  /* CHART LEGEND */
-  .chart-legend {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    font-size: 10px;
-  }
-
-  .chart-legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--text-2);
-  }
-
-  .legend-line {
-    width: 16px;
-    height: 3px;
-    border-radius: 2px;
-  }
-
-  .legend-rect {
-    width: 10px; height: 10px;
-    border-radius: 2px;
-  }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pink:#EC008C; --red:#ED1C24; --yellow:#FFCB05;
+  --teal:#32BCAD; --purple:#C6168D; --gray:#4D4D4F;
+  --bg:#F2F1ED; --surface:#FFFFFF; --surface2:#ECEAE4;
+  --border:rgba(0,0,0,0.08); --border2:rgba(0,0,0,0.15);
+  --t1:#1A1A18; --t2:#4D4D4F; --t3:#9B9A96;
+  --r-sm:6px; --r-md:10px; --r-lg:14px; --r-xl:18px;
+}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--t1);font-size:13px;line-height:1.5;min-height:100vh}
+.page{max-width:1280px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
+
+/* ── Header ── */
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:12px;
+  background:var(--surface);border-radius:var(--r-xl);
+  padding:1rem 1.5rem;margin-bottom:1.25rem;
+  border:0.5px solid var(--border2);
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{
+  width:40px;height:40px;border-radius:9px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--pink) 0%,var(--red) 50%,var(--purple) 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;color:white;letter-spacing:-0.5px;
+}
+.brand-text h1{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.brand-text p{font-size:11px;color:var(--t3);margin-top:1px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filter-group{display:flex;align-items:center;gap:5px}
+.filter-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3)}
+select{
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:500;
+  padding:6px 24px 6px 10px;border-radius:var(--r-md);
+  border:1px solid var(--border2);background:var(--surface);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%239B9A96' d='M5 6 0 0h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;
+  color:var(--t1);cursor:pointer;appearance:none;outline:none;transition:border-color .15s;
+}
+select:focus{border-color:var(--pink);box-shadow:0 0 0 2px rgba(236,0,140,.1)}
+.date-chip{font-size:11px;font-weight:600;padding:5px 11px;border-radius:var(--r-md);background:var(--surface2);color:var(--t2);border:1px solid var(--border2)}
+
+/* ── KPI Grid ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:1.1rem}
+@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(3,1fr)}}
+.kpi{
+  background:var(--surface);border:0.5px solid var(--border);
+  border-radius:var(--r-lg);padding:.9rem 1rem;position:relative;overflow:hidden;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);transition:transform .15s,box-shadow .15s;
+}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,0.09)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r-lg) var(--r-lg) 0 0}
+.kpi:nth-child(1)::before{background:var(--pink)}
+.kpi:nth-child(2)::before{background:var(--teal)}
+.kpi:nth-child(3)::before{background:var(--yellow)}
+.kpi:nth-child(4)::before{background:var(--purple)}
+.kpi:nth-child(5)::before{background:var(--red)}
+.kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t3);margin-bottom:6px}
+.kpi-val{font-size:22px;font-weight:800;letter-spacing:-.8px;line-height:1;color:var(--t1)}
+.kpi-sub{font-size:11px;color:var(--t3);margin-top:4px}
+.kpi-badge{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;margin-top:5px}
+.badge-up{background:#D1FAE5;color:#065F46}
+.badge-dn{background:#FEE2E2;color:#991B1B}
+.badge-neu{background:#EDE9FE;color:#5B21B6}
+
+/* ── Layout helpers ── */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.row-65{display:grid;grid-template-columns:1.7fr 1fr;gap:12px;margin-bottom:12px}
+.row-35{display:grid;grid-template-columns:1fr 1.7fr;gap:12px;margin-bottom:12px}
+@media(max-width:800px){.row2,.row3,.row-65,.row-35{grid-template-columns:1fr}}
+.card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r-lg);padding:1.1rem 1.2rem;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.ct{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--t3);margin-bottom:12px}
+.section-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin:1.2rem 0 .7rem;display:flex;align-items:center;gap:8px}
+.section-lbl::after{content:'';flex:1;height:0.5px;background:var(--border2)}
+
+/* Legend */
+.leg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.li{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t2);font-weight:500}
+.ld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+/* Stage funnel bars */
+.funnel{display:flex;flex-direction:column;gap:5px}
+.funnel-row{display:flex;align-items:center;gap:8px}
+.funnel-lbl{font-size:11px;color:var(--t2);min-width:85px;white-space:nowrap;font-weight:500}
+.funnel-track{flex:1;height:20px;background:var(--surface2);border-radius:4px;overflow:hidden;position:relative}
+.funnel-fill{height:100%;border-radius:4px;transition:width .5s cubic-bezier(.25,.46,.45,.94);display:flex;align-items:center;justify-content:flex-end;padding-right:6px}
+.funnel-fill span{font-size:10px;font-weight:700;color:white;white-space:nowrap}
+.funnel-val{font-size:11px;font-family:'DM Mono',monospace;color:var(--t2);min-width:52px;text-align:right;font-weight:500}
+
+/* Product table */
+.ptbl{width:100%;border-collapse:collapse;font-size:12px}
+.ptbl th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);padding:7px 8px;text-align:left;border-bottom:1px solid var(--border)}
+.ptbl td{padding:8px 8px;border-bottom:0.5px solid var(--border);color:var(--t1);vertical-align:middle}
+.ptbl tr:last-child td{border-bottom:none}
+.ptbl tbody tr:hover{background:var(--surface2)}
+.mb-wrap{display:flex;align-items:center;gap:6px}
+.mb-bg{flex:1;height:5px;background:var(--surface2);border-radius:99px;overflow:hidden}
+.mb-fill{height:100%;border-radius:99px}
+
+/* Waterfall SVG */
+#wf-svg-wrap{width:100%;overflow-x:auto}
+
+/* Tabs */
+.tabs{display:flex;gap:5px;margin-bottom:14px}
+.tab{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;padding:5px 14px;border-radius:var(--r-md);border:1.5px solid var(--border2);background:transparent;color:var(--t3);cursor:pointer;transition:all .15s}
+.tab:hover{border-color:var(--pink);color:var(--pink)}
+.tab.active{background:var(--pink);color:white;border-color:var(--pink);box-shadow:0 2px 8px rgba(236,0,140,.25)}
+
+/* FAB table */
+.fab-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.fab-tbl th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);padding:7px 8px;text-align:left;border-bottom:1px solid var(--border)}
+.fab-tbl td{padding:7px 8px;border-bottom:0.5px solid var(--border);color:var(--t1)}
+.fab-tbl tr:last-child td{border-bottom:none}
+.fab-tbl tbody tr:hover{background:var(--surface2)}
+.pill{display:inline-flex;align-items:center;gap:2px;padding:1px 7px;border-radius:99px;font-size:10px;font-weight:700}
+.pill-pk{background:#FCE7F3;color:#9D174D}
+.pill-tl{background:#CCFBF1;color:#134E4A}
+.pill-yw{background:#FEF9C3;color:#854D0E}
+.pill-pu{background:#EDE9FE;color:#5B21B6}
+.pill-gy{background:#F3F4F6;color:#374151}
+
+/* ── Account Pipeline Tables ── */
+.acct-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:12px}
+@media(max-width:960px){.acct-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.acct-grid{grid-template-columns:1fr}}
+
+.acct-panel{
+  background:var(--surface);border:0.5px solid var(--border);
+  border-radius:var(--r-lg);overflow:hidden;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);
+  display:flex;flex-direction:column;
+  max-height:420px; /* cap — shows ~5 rows then scrolls */
+}
+.acct-panel-hdr{
+  padding:.65rem 1rem .5rem;border-bottom:2px solid var(--red);
+  flex-shrink:0; /* never compress the header */
+}
+.acct-panel-hdr h3{font-size:13px;font-weight:800;color:var(--red);letter-spacing:-.2px}
+.acct-panel-hdr span{font-size:11px;color:var(--t3);font-weight:400}
+
+/* Scroll wrapper — sits between header and bottom of panel */
+.acct-scroll{
+  flex:1;overflow-y:auto;overflow-x:auto;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(237,28,36,0.25) transparent;
+}
+.acct-scroll::-webkit-scrollbar{width:4px;height:4px}
+.acct-scroll::-webkit-scrollbar-track{background:transparent}
+.acct-scroll::-webkit-scrollbar-thumb{background:rgba(237,28,36,0.25);border-radius:99px}
+.acct-scroll::-webkit-scrollbar-thumb:hover{background:rgba(237,28,36,0.5)}
+
+/* Row count badge shown in header when >5 entries */
+.acct-count{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:18px;height:18px;padding:0 5px;
+  background:var(--red);color:white;
+  border-radius:99px;font-size:10px;font-weight:700;
+  margin-left:6px;vertical-align:middle;
+}
+
+/* Scroll hint fade at bottom — visible only when scrollable */
+.acct-panel.is-scrollable .acct-scroll::after{
+  content:'';display:block;height:28px;
+  background:linear-gradient(to bottom,transparent,rgba(255,255,255,0.9));
+  position:sticky;bottom:0;pointer-events:none;
+  margin-top:-28px;
+}
+
+.acct-tbl{width:100%;border-collapse:collapse;font-size:11.5px;min-width:360px}
+.acct-tbl thead{position:sticky;top:0;z-index:2}
+.acct-tbl thead tr{background:#FFF5F5}
+.acct-tbl th{
+  padding:5px 7px;font-size:10px;font-weight:700;color:var(--red);
+  text-align:left;border-bottom:1px solid rgba(237,28,36,0.2);
+  white-space:nowrap;
+  /* sticky shadow when scrolled */
+  box-shadow:0 1px 0 rgba(237,28,36,0.12);
+}
+.acct-tbl th.num{text-align:right}
+.acct-tbl td{padding:7px 7px;border-bottom:0.5px solid var(--border);vertical-align:top;color:var(--t1)}
+.acct-tbl td.num{text-align:right;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;color:var(--t2)}
+.acct-tbl td.dash{text-align:right;color:var(--t3);font-family:'DM Mono',monospace;font-size:11px}
+.acct-tbl tbody tr:hover{background:#FFF5F5}
+.acct-tbl tbody tr:last-child td{border-bottom:none}
+.acct-tbl .row-num{font-weight:700;color:var(--t3);font-size:11px;min-width:14px}
+.acct-name{font-weight:700;font-size:11.5px;color:var(--t1);line-height:1.3}
+.acct-name span{font-weight:700;color:var(--t1)}
+.acct-service{font-size:10.5px;color:var(--t2);margin-top:1px;font-weight:400}
+.remark-chip{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;white-space:normal;word-break:break-word;line-height:1.4}
+.remark-green{background:#D1FAE5;color:#065F46}
+.remark-blue{background:#DBEAFE;color:#1E40AF}
+.remark-yellow{background:#FEF3C7;color:#92400E}
+.remark-gray{background:#F3F4F6;color:#374151}
+.remark-red{background:#FEE2E2;color:#991B1B}
+.remark-teal{background:#CCFBF1;color:#134E4A}
+.acct-others{background:#FFF5F5}
+.acct-others td{font-weight:600;color:var(--red)!important}
+.col-subhdr{display:flex;gap:3px}
+.col-subhdr span{flex:1;text-align:right;font-size:9px;font-weight:700;color:var(--red);opacity:.7}
+
+/* ── Rich Hover Tooltip ── */
+#hover-tooltip{
+  position:fixed;z-index:9999;pointer-events:none;
+  background:#1e1e1c;color:#e8e6e0;
+  border-radius:var(--r-lg);
+  font-size:12px;line-height:1.5;
+  box-shadow:0 12px 40px rgba(0,0,0,0.35),0 2px 8px rgba(0,0,0,0.2);
+  min-width:280px;max-width:340px;
+  opacity:0;transition:opacity .15s,transform .15s;
+  transform:translateY(4px);
+  border:1px solid rgba(255,255,255,0.09);
+  overflow:hidden;
+}
+#hover-tooltip.visible{opacity:1;transform:translateY(0)}
+
+/* Header strip */
+#hover-tooltip .tt-hdr{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 13px 9px;
+  border-bottom:2px solid transparent;
+  background:rgba(255,255,255,0.04);
+}
+#hover-tooltip .tt-hdr-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+#hover-tooltip .tt-hdr-title{font-size:13px;font-weight:800;color:#fff;letter-spacing:-.2px}
+
+/* Section heading */
+#hover-tooltip .tt-sec-hdr{
+  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:rgba(255,255,255,0.35);padding:7px 13px 3px;
+}
+
+/* Table inside tooltip */
+#hover-tooltip .tt-tbl{width:100%;border-collapse:collapse;padding:0 13px}
+#hover-tooltip .tt-tbl thead tr{border-bottom:1px solid rgba(255,255,255,0.07)}
+#hover-tooltip .tt-tbl th{
+  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;
+  color:rgba(255,255,255,0.3);padding:4px 13px 3px;text-align:left;
+}
+#hover-tooltip .tt-tbl th:not(:first-child){text-align:right}
+#hover-tooltip .tt-td-lbl{
+  font-size:11px;color:rgba(255,255,255,0.65);
+  padding:4px 13px 2px;vertical-align:middle;
+  display:flex;align-items:center;gap:5px;white-space:nowrap;
+}
+#hover-tooltip .tt-td-val{
+  font-size:11px;font-weight:700;font-family:'DM Mono',monospace;
+  padding:4px 13px 2px;text-align:right;vertical-align:middle;white-space:nowrap;
+}
+/* dot inside label cell */
+#hover-tooltip .tt-dot{
+  display:inline-block;width:8px;height:8px;border-radius:2px;flex-shrink:0;
+}
+/* inline bar row */
+#hover-tooltip .tt-bar-row td{padding:0 13px 4px}
+#hover-tooltip .tt-inline-bar{
+  height:3px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;
+}
+#hover-tooltip .tt-inline-bar div{height:100%;border-radius:2px;transition:width .4s}
+/* total / summary row */
+#hover-tooltip .tt-total-row .tt-td-lbl{
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  color:rgba(255,255,255,0.4);border-top:1px solid rgba(255,255,255,0.08);
+  padding-top:6px;margin-top:2px;
+}
+#hover-tooltip .tt-total-row .tt-td-val{
+  border-top:1px solid rgba(255,255,255,0.08);
+  padding-top:6px;
+}
+/* note at bottom */
+#hover-tooltip .tt-note{
+  font-size:10px;color:rgba(255,255,255,0.35);
+  font-style:italic;padding:6px 13px 9px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  margin-top:2px;line-height:1.5;
+}
+/* legacy helpers still used by KPI / funnel tooltips */
+#hover-tooltip .tt-title{font-weight:700;font-size:13px;margin-bottom:6px;padding:10px 13px 6px;border-bottom:1px solid rgba(255,255,255,0.1);display:block}
+#hover-tooltip .tt-row{display:flex;justify-content:space-between;gap:14px;padding:2px 13px}
+#hover-tooltip .tt-lbl{color:rgba(255,255,255,0.55);font-size:11px}
+#hover-tooltip .tt-val{font-weight:700;font-family:'DM Mono',monospace;font-size:11px}
+#hover-tooltip .tt-bar{height:3px;border-radius:2px;margin:2px 13px 4px;background:rgba(255,255,255,0.12);overflow:hidden}
+#hover-tooltip .tt-bar-fill{height:100%;border-radius:2px}
+#hover-tooltip .tt-sep{border:none;border-top:1px solid rgba(255,255,255,0.08);margin:5px 0}
+
+/* ── KPI hover ── */
+.kpi{cursor:default}
+.kpi:hover .kpi-lbl{color:var(--t2)}
+
+/* ── Funnel row hover ── */
+.funnel-row{cursor:pointer;border-radius:4px;padding:2px 0;transition:background .12s}
+.funnel-row:hover{background:rgba(236,0,140,0.05)}
+.funnel-row:hover .funnel-lbl{color:var(--pink);font-weight:600}
+.funnel-row:hover .funnel-val{color:var(--pink);font-weight:700}
+
+/* ── Account table row hover ── */
+.acct-tbl tbody tr{cursor:pointer;transition:background .12s}
+.acct-tbl tbody tr:hover{background:#FFF0F0 !important}
+.acct-tbl tbody tr:hover .acct-name{color:var(--red)}
+.acct-tbl tbody tr:hover .row-num{color:var(--red)}
+
+/* ── FAB table row hover ── */
+.fab-tbl tbody tr{cursor:default;transition:background .12s}
+.fab-tbl tbody tr:hover{background:#F0FFFE !important}
+
+/* ── Waterfall bar hover glow ── */
+.wf-bar-group{cursor:pointer}
+.wf-bar-group rect{transition:filter .15s,opacity .15s}
+.wf-bar-group:hover rect{filter:brightness(1.12) drop-shadow(0 2px 6px rgba(0,0,0,0.18))}
+.wf-bar-group.dimmed{opacity:0.35}
+.wf-bar-group.dimmed:hover{opacity:1}
+
+/* ── Product table row hover ── */
+.ptbl tbody tr{cursor:default;transition:background .12s}
+.ptbl tbody tr:hover{background:#FFF5FF !important}
+.ptbl tbody tr:hover td:first-child{color:var(--pink);font-weight:700}
+
+/* ── Channel chart hover crosshair ── */
+.chart-wrap{position:relative}
+.chart-wrap:hover canvas{cursor:crosshair}
+
+/* Footer */
+.footer{text-align:center;font-size:11px;color:var(--t3);margin-top:2rem;padding-top:1rem;border-top:0.5px solid var(--border)}
+.footer strong{color:var(--pink)}
 </style>
 </head>
 <body>
+<div id="hover-tooltip"></div>
+<div class="page">
 
-<!-- SIDEBAR OVERLAY -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-<!-- SIDEBAR -->
-<aside class="sidebar" id="sidebar">
-  <div class="logo">
-    <div class="logo-icon">✦</div>
-    <span>Sales Dashboard</span>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="brand">
+    <div class="logo">IOH</div>
+    <div class="brand-text">
+      <h1>Pipeline &amp; Upside Dashboard</h1>
+      <p id="sub-label">As per Apr 27, 2026 · All Channels · All Products</p>
+    </div>
   </div>
-  <nav class="nav">
-    <div class="nav-item active">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
-      Overview
-    </div>
-    <div class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-      Opportunity
-    </div>
-    <div class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-      New Sales Deals
-    </div>
-    <div class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-      Forecast
-    </div>
-    <div class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-      Reports
-    </div>
-    <div class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      Search Pipeline
-    </div>
-    <div class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"></path></svg>
-      Settings
-    </div>
-  </nav>
-</aside>
-
-<!-- MAIN -->
-<div class="main">
-
-  <!-- TOPBAR -->
-  <header class="topbar">
-    <button class="hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-    </button>
-    <div class="topbar-title">Overview <span style="color:var(--text-3);font-weight:400;font-size:13px;">— Mei 2026</span></div>
-
+  <div class="filters">
     <div class="filter-group">
-      <span class="filter-label">Periode</span>
-      <button class="filter-select">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-        Mei 2026
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-      </button>
+      <span class="filter-label">Period</span>
+      <select id="f-period">
+        <option value="0" selected>Apr-26</option>
+        <option value="1">May-26</option>
+        <option value="2">Jun-26</option>
+        <option value="all">Apr–Jun 26 (All)</option>
+      </select>
     </div>
-
     <div class="filter-group">
-      <span class="filter-label">Function</span>
-      <button class="filter-select">F&amp;G <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+      <span class="filter-label">Sales Channel</span>
+      <select id="f-channel">
+        <option value="All" selected>All Channels</option>
+        <option value="Sales Channel 1">Sales Channel 1</option>
+        <option value="Sales Channel 2">Sales Channel 2</option>
+        <option value="Sales Channel 3">Sales Channel 3</option>
+        <option value="Sales Channel 4">Sales Channel 4</option>
+      </select>
     </div>
-
     <div class="filter-group">
-      <span class="filter-label">Sales Person</span>
-      <button class="filter-select">All <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></button>
+      <span class="filter-label">Product</span>
+      <select id="f-product">
+        <option value="All" selected>All Products</option>
+        <option>Data Analytics</option>
+        <option>Fixed Data</option>
+        <option>Fixed Voice</option>
+        <option>ICT</option>
+        <option>IOT</option>
+        <option>M2M</option>
+        <option>Mobile - Bulk</option>
+        <option>Mobile - Device</option>
+        <option>Mobile - Postpaid</option>
+      </select>
     </div>
+    <span class="date-chip">As of Apr 27, 2026</span>
+  </div>
+</div>
 
-    <div class="user-pill">
-      <div class="avatar">BS</div>
-      <div class="user-info">
-        <div class="name">Budi Santoso</div>
-        <div class="role">Sales Executive</div>
-      </div>
-    </div>
-  </header>
+<!-- KPI CARDS -->
+<div class="kpi-grid" id="kpi-grid"></div>
 
-  <!-- CONTENT -->
-  <div class="content">
+<!-- SECTION: PIPELINE -->
+<div class="section-lbl">SFA Pipeline Analysis</div>
 
-    <div class="section-header">
-      <div class="section-title">Revenue Forecast <span>(Mei 2026)</span></div>
-      <div class="last-updated">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-4.95"></path></svg>
-        Last updated: 10 menit yang lalu
-      </div>
-    </div>
-
-    <!-- KPI CARDS -->
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background:#eff6ff;">🎯</div>
-        <div class="kpi-label">Target Revenue</div>
-        <div class="kpi-value">Rp 10.000.000.000</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--primary);"></div></div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background:#f0fdf4;">💰</div>
-        <div class="kpi-label">Actual Revenue</div>
-        <div class="kpi-value">Rp 4.200.000.000</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:42%;background:var(--accent-green);"></div></div>
-        <div class="kpi-sub">42% dari Target</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background:#fdf4ff;">✨</div>
-        <div class="kpi-label">New Deals Impact <small>(Current Month)</small></div>
-        <div class="kpi-value">Rp 1.800.000.000</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:18%;background:#a855f7;"></div></div>
-        <div class="kpi-sub">18% dari Target</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background:#fff7ed;">🔗</div>
-        <div class="kpi-label">Estimasi Pipeline <small>(RFS Date This Month)</small></div>
-        <div class="kpi-value">Rp 4.500.000.000</div>
-        <div class="progress-bar"><div class="progress-fill" style="width:45%;background:var(--accent-orange);"></div></div>
-        <div class="kpi-sub">45% dari Target</div>
-      </div>
-      <div class="kpi-card highlight">
-        <div class="kpi-label" style="font-size:10px;color:var(--text-3);margin-bottom:6px;">Total Forecast (Actual + New Deals + Est. Pipeline + Est. Churn)</div>
-        <div class="kpi-value">Rp 10.300.000.000</div>
-        <div class="kpi-sub green-big" style="margin-top:6px;">103% dari Target</div>
+<div class="row-65">
+  <!-- Waterfall: Base → FAB → SFA Pipe → Complete → Target -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+      <div class="ct" style="margin-bottom:0">Pipeline Waterfall (MRC, IDR Bn)</div>
+      <div class="tabs" id="wf-tabs">
+        <button class="tab active" data-m="Apr-26">Apr-26</button>
+        <button class="tab" data-m="May-26">May-26</button>
+        <button class="tab" data-m="Jun-26">Jun-26</button>
       </div>
     </div>
-
-    <!-- ROW 2: Gap Revenue | Pipeline Closing | Delivery Status -->
-    <div class="grid-3">
-
-      <!-- Gap Revenue -->
-      <div class="card">
-        <div class="card-title">Gap Revenue &amp; Coverage</div>
-        <div class="gauge-wrap">
-          <!-- SVG Gauge -->
-          <svg class="gauge-svg" width="130" height="80" viewBox="0 0 130 80">
-            <!-- Background arc -->
-            <path d="M 15 75 A 50 50 0 0 1 115 75" fill="none" stroke="#e2e8f0" stroke-width="12" stroke-linecap="round"></path>
-            <!-- Red zone (gap) -->
-            <path d="M 15 75 A 50 50 0 0 1 65 25" fill="none" stroke="#ef4444" stroke-width="12" stroke-linecap="round"></path>
-            <!-- Orange zone -->
-            <path d="M 65 25 A 50 50 0 0 1 100 37" fill="none" stroke="#f97316" stroke-width="12" stroke-linecap="round"></path>
-            <!-- Green zone (surplus) -->
-            <path d="M 100 37 A 50 50 0 0 1 115 75" fill="none" stroke="#22c55e" stroke-width="12" stroke-linecap="round"></path>
-            <!-- Needle -->
-            <line x1="65" y1="75" x2="100" y2="38" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"></line>
-            <circle cx="65" cy="75" r="5" fill="#1e293b"></circle>
-            <!-- Center label -->
-            <text x="65" y="68" text-anchor="middle" font-size="9" fill="#94a3b8" font-family="DM Sans">Rp 1.300.000.000</text>
-          </svg>
-          <div class="gauge-info">
-            <div class="coverage-pct">103%</div>
-            <div class="coverage-label">Coverage</div>
-            <div class="badge green">Pipeline Mencukupi</div>
-            <div style="font-size:10px;color:var(--text-3);margin-top:6px;">Forecast melebihi target</div>
-          </div>
-        </div>
-        <div class="legend">
-          <div class="legend-item"><div class="dot" style="background:#ef4444;"></div>Gap: Rp 1.300.000.000</div>
-          <div class="legend-item"><div class="dot" style="background:#22c55e;"></div>Surplus: Rp 500.000.000</div>
-        </div>
-      </div>
-
-      <!-- Pipeline Closing Soon -->
-      <div class="card">
-        <div class="card-title">Pipeline Closing Soon</div>
-        <table>
-          <thead>
-            <tr>
-              <th>Pipeline</th>
-              <th>Account</th>
-              <th>RFS Date</th>
-              <th>Est. Value</th>
-              <th>Prob.</th>
-              <th>Stage</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0012</td>
-              <td>PT. Maju Bersama</td>
-              <td style="color:var(--text-3);white-space:nowrap;">10 Mei 2026</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 800.000.000</td>
-              <td style="color:var(--accent-green);font-weight:700;">90%</td>
-              <td><span class="stage-badge stage-proposal">Proposal</span></td>
-            </tr>
-            <tr>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0008</td>
-              <td>PT. Sukses Abadi</td>
-              <td style="color:var(--text-3);white-space:nowrap;">15 Mei 2026</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 650.000.000</td>
-              <td style="color:var(--accent-green);font-weight:700;">80%</td>
-              <td><span class="stage-badge stage-negotiation">Negotiation</span></td>
-            </tr>
-            <tr>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0015</td>
-              <td>PT. Global Solusi</td>
-              <td style="color:var(--text-3);white-space:nowrap;">20 Mei 2026</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 500.000.000</td>
-              <td style="color:var(--accent-yellow);font-weight:700;">70%</td>
-              <td><span class="stage-badge stage-proposal">Proposal</span></td>
-            </tr>
-            <tr>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0019</td>
-              <td>PT. Prima Teknologi</td>
-              <td style="color:var(--text-3);white-space:nowrap;">28 Mei 2026</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 450.000.000</td>
-              <td style="color:var(--text-2);font-weight:700;">60%</td>
-              <td><span class="stage-badge stage-qualification">Qualification</span></td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="see-all">Lihat semua pipeline <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
-      </div>
-
-      <!-- Delivery Status -->
-      <div class="card">
-        <div class="card-title">New Sales Deals – Delivery Status <span>(Mei 2026)</span></div>
-        <div class="donut-wrap">
-          <!-- Donut SVG -->
-          <svg width="110" height="110" viewBox="0 0 110 110">
-            <circle cx="55" cy="55" r="40" fill="none" stroke="#e2e8f0" stroke-width="18"></circle>
-            <!-- Delivered 60% → circumference of r=40 ≈ 251.3; 60% = 150.8 -->
-            <circle cx="55" cy="55" r="40" fill="none" stroke="#f97316" stroke-width="18" stroke-dasharray="150.8 251.3" stroke-dashoffset="0" transform="rotate(-90 55 55)"></circle>
-            <!-- On Progress 40% → 100.5 -->
-            <circle cx="55" cy="55" r="40" fill="none" stroke="#2563eb" stroke-width="18" stroke-dasharray="100.5 251.3" stroke-dashoffset="-150.8" transform="rotate(-90 55 55)"></circle>
-            <text x="55" y="49" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="DM Sans">Total Value</text>
-            <text x="55" y="60" text-anchor="middle" font-size="9" font-weight="700" fill="#0f172a" font-family="DM Sans">Rp 1.800.000</text>
-            <text x="55" y="70" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="DM Sans">.000</text>
-          </svg>
-          <div class="donut-legend">
-            <div class="donut-legend-item">
-              <div class="color-block" style="background:#2563eb;"></div>
-              <div>
-                <div class="dl-label">On Progress</div>
-                <div class="dl-value">Rp 720.000.000</div>
-                <div class="dl-pct">(40%)</div>
-              </div>
-            </div>
-            <div class="donut-legend-item">
-              <div class="color-block" style="background:#f97316;"></div>
-              <div>
-                <div class="dl-label">Delivered</div>
-                <div class="dl-value">Rp 1.080.000.000</div>
-                <div class="dl-pct">(60%)</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="see-all" style="margin-top:10px;">Lihat detail <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
-      </div>
+    <div class="leg">
+      <span class="li"><span class="ld" style="background:var(--gray)"></span>Baseline (MRC)</span>
+      <span class="li"><span class="ld" style="background:var(--teal)"></span>FAB Upside</span>
+      <span class="li"><span class="ld" style="background:var(--pink)"></span>SFA Complete</span>
+      <span class="li"><span class="ld" style="background:var(--purple)"></span>SFA Pipeline</span>
+      <span class="li"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:repeating-linear-gradient(45deg,#aaa 0,#aaa 1.5px,transparent 1.5px,transparent 5px);border:1px solid #aaa"></span>Target</span>
+      <span class="li"><span class="ld" style="background:var(--yellow)"></span>Gap</span>
     </div>
+    <div id="wf-svg-wrap"></div>
+  </div>
 
-    <!-- ROW 3: Summary | Bar Chart | Search Pipeline -->
-    <div class="grid-21">
-
-      <!-- New Sales Deals Summary -->
-      <div class="card">
-        <div class="card-title">New Sales Deals Summary <span>(Mei 2026)</span></div>
-        <div class="summary-grid">
-          <div class="summary-item">
-            <div class="summary-item-label">New Sales Deals (On Progress)</div>
-            <div class="summary-item-value" style="color:var(--primary);">12 <span style="font-size:13px;font-family:&#39;DM Sans&#39;">Deals</span></div>
-            <div class="summary-item-sub">Rp 2.400.000.000</div>
-          </div>
-          <div class="summary-item">
-            <div class="summary-item-label">Deals Delivered – Belum First Bill</div>
-            <div class="summary-item-value" style="color:var(--accent-orange);">7 <span style="font-size:13px;font-family:&#39;DM Sans&#39;">Deals</span></div>
-            <div class="summary-item-sub">Rp 1.700.000.000</div>
-          </div>
-          <div class="summary-item">
-            <div class="summary-item-label">Deals Delivered – Sudah First Bill</div>
-            <div class="summary-item-value" style="color:var(--accent-green);">9 <span style="font-size:13px;font-family:&#39;DM Sans&#39;">Deals</span></div>
-            <div class="summary-item-sub">Rp 1.900.000.000</div>
-          </div>
-          <div class="summary-item">
-            <div class="summary-item-label">Total Deals Delivered</div>
-            <div class="summary-item-value" style="color:var(--text-1);">16 <span style="font-size:13px;font-family:&#39;DM Sans&#39;">Deals</span></div>
-            <div class="summary-item-sub">Rp 3.600.000.000</div>
-          </div>
-        </div>
-        <div class="see-all" style="margin-top:10px;">Lihat semua <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
-      </div>
-
-      <!-- Pipeline Estimasi vs Target (Bar Chart) -->
-      <div class="card">
-        <div class="card-title">Actual Revenue, Est. Pipeline vs Target</div>
-        <div style="display:flex;gap:12px;align-items:flex-start;">
-          <div style="flex:1;">
-            <div style="font-size:10px;color:var(--text-3);margin-bottom:4px;">(Rp Miliar)</div>
-            <!-- Y-axis labels + chart -->
-            <div style="display:flex;gap:6px;align-items:flex-end;">
-              <div style="display:flex;flex-direction:column;justify-content:space-between;height:120px;font-size:9px;color:var(--text-3);text-align:right;padding-bottom:2px;">
-                <span>15.0</span><span>12.5</span><span>10.0</span><span>7.5</span><span>5.0</span><span>2.5</span><span>0</span>
-              </div>
-              <div style="flex:1;position:relative;">
-                <!-- Grid lines -->
-                <div style="position:absolute;top:0;left:0;right:0;bottom:0;">
-                  <div style="height:100%;display:flex;flex-direction:column;justify-content:space-between;">
-                    <div style="border-bottom:1px dashed #e2e8f0;flex:1;"></div>
-                    <div style="border-bottom:1px dashed #e2e8f0;flex:1;"></div>
-                    <div style="border-bottom:1px dashed #e2e8f0;flex:1;"></div>
-                    <div style="border-bottom:1px dashed #e2e8f0;flex:1;"></div>
-                    <div style="border-bottom:1px dashed #e2e8f0;flex:1;"></div>
-                    <div style="border-bottom:1px solid #e2e8f0;flex:1;"></div>
-                  </div>
-                </div>
-                <div class="bar-chart" style="position:relative;z-index:1;">
-                  <!-- Target line (10.0) -->
-                  <div style="position:absolute;left:0;right:0;bottom:calc((10/15)*100%);border-top:2px dashed #8b5cf6;z-index:2;"></div>
-
-                  <div class="bar-group">
-                    <div class="bar" style="height:calc((4.2/15)*140px);background:var(--accent-green);">
-                      <span class="bar-val">4.2</span>
-                    </div>
-                    <div class="bar-label">Actual</div>
-                  </div>
-
-                  <div class="bar-group">
-                    <!-- Pipeline Estimasi stacked-ish -->
-                    <div style="position:relative;">
-                      <div class="bar" style="height:calc((4.5/15)*140px);background:var(--accent-orange);width:56px;border-radius:0;">
-                      </div>
-                      <div style="position:absolute;top:0;left:0;right:0;height:calc((4.2/15)*140px);background:#fbbf24;border-radius:0;bottom:0;top:auto;"></div>
-                      <div style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);background:#2563eb;color:#fff;border-radius:20px;padding:2px 7px;font-size:10px;font-weight:700;white-space:nowrap;">10.0</div>
-                    </div>
-                    <div class="bar-label">Pipeline Estimasi<br>(RFS This Month)</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="chart-legend" style="margin-top:20px;">
-            <div class="chart-legend-item"><div class="legend-line" style="background:#8b5cf6;border-top:2px dashed #8b5cf6;height:0;"></div>Target Revenue</div>
-            <div class="chart-legend-item"><div class="legend-rect" style="background:var(--border);"></div>Gap</div>
-            <div class="chart-legend-item"><div class="legend-rect" style="background:var(--accent-orange);"></div>Estimasi Pipeline</div>
-            <div class="chart-legend-item"><div class="legend-rect" style="background:var(--accent-green);"></div>Actual Revenue</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Search Pipeline -->
-      <div class="card">
-        <div class="card-title">Search Pipeline</div>
-        <div class="search-box">
-          <input type="text" class="search-input" value="PL-2405-0012" placeholder="Cari pipeline...">
-          <button class="btn-primary">Search</button>
-        </div>
-        <div class="result-card">
-          <div class="result-header">
-            <span class="result-id">PL-2405-0012 – PT. Maju Bersama</span>
-            <span class="stage-badge stage-proposal">Proposal</span>
-          </div>
-          <div class="result-grid">
-            <div class="result-row"><span class="rl">Account </span><span class="rv">PT. Maju Bersama</span></div>
-            <div class="result-row"><span class="rl">Est. Value </span><span class="rv">Rp 800.000.000</span></div>
-            <div class="result-row"><span class="rl">Sales Person </span><span class="rv">Budi Santoso</span></div>
-            <div class="result-row"><span class="rl">Probability </span><span class="rv" style="color:var(--accent-green);">90%</span></div>
-            <div class="result-row"><span class="rl">Function </span><span class="rv">Financial &amp; Government</span></div>
-            <div class="result-row"><span class="rl">Source </span><span class="rv">Self Input</span></div>
-            <div class="result-row"><span class="rl">RFS Date </span><span class="rv">10 Mei 2026</span></div>
-            <div class="result-row"><span class="rl">Created Date </span><span class="rv">2 Mei 2026</span></div>
-          </div>
-          <div style="font-size:11px;font-weight:600;color:var(--text-1);margin-bottom:8px;">Staging / Pipeline Status</div>
-          <div class="pipeline-stages">
-            <div class="stage-step">
-              <div class="stage-circle done">✓</div>
-              <div class="stage-name">Qualification</div>
-            </div>
-            <div class="stage-line done"></div>
-            <div class="stage-step">
-              <div class="stage-circle done">✓</div>
-              <div class="stage-name">Need Analysis</div>
-            </div>
-            <div class="stage-line done"></div>
-            <div class="stage-step">
-              <div class="stage-circle active">3</div>
-              <div class="stage-name">Proposal</div>
-            </div>
-            <div class="stage-line"></div>
-            <div class="stage-step">
-              <div class="stage-circle">4</div>
-              <div class="stage-name">Negotiation</div>
-            </div>
-            <div class="stage-line"></div>
-            <div class="stage-step">
-              <div class="stage-circle">5</div>
-              <div class="stage-name">Closed Won</div>
-            </div>
-          </div>
-          <div class="see-all" style="margin-top:10px;">Lihat detail pipeline <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
-        </div>
-      </div>
+  <!-- Stage Funnel -->
+  <div class="card">
+    <div class="ct">Pipeline Funnel by Stage (MRC, IDR Mn)</div>
+    <div class="funnel" id="funnel-bars"></div>
+    <div style="margin-top:14px">
+      <div class="ct" style="margin-bottom:8px">Pipeline by Month (MRC Trend)</div>
+      <div style="position:relative;height:130px"><canvas id="trendChart" role="img"></canvas></div>
     </div>
+  </div>
+</div>
 
-    <!-- ROW 4: Performance Tables + Top Pipeline -->
-    <div class="grid-21">
+<div class="row2">
+  <!-- Pipeline by Channel (stacked bar) -->
+  <div class="card">
+    <div class="ct">Pipeline MRC by Channel &amp; Stage</div>
+    <div style="position:relative;height:220px"><canvas id="channelChart" role="img"></canvas></div>
+  </div>
+  <!-- Pipeline by Product -->
+  <div class="card">
+    <div class="ct">Pipeline MRC by Product (IDR Mn)</div>
+    <div style="position:relative;height:220px"><canvas id="productChart" role="img"></canvas></div>
+  </div>
+</div>
 
-      <!-- Performance per Function -->
-      <div class="card">
-        <div class="card-title">Performance per Function <span>(Mei 2026)</span></div>
-        <table class="perf-table">
-          <thead>
-            <tr>
-              <th>Function</th>
-              <th>Target (Rp)</th>
-              <th>Actual (Rp)</th>
-              <th>Forecast (Rp)</th>
-              <th>Coverage</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style="font-weight:600;">Commercial</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">6.000.000.000</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.600.000.000</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">6.400.000.000</td>
-              <td style="font-weight:700;">107% <span class="coverage-dot" style="background:#22c55e;"></span></td>
-            </tr>
-            <tr>
-              <td style="font-weight:600;">Public Sector</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.500.000.000</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">1.000.000.000</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.200.000.000</td>
-              <td style="font-weight:700;">88% <span class="coverage-dot" style="background:#f59e0b;"></span></td>
-            </tr>
-            <tr>
-              <td style="font-weight:600;">Enterprise</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">1.500.000.000</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">600.000.000</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">1.900.000.000</td>
-              <td style="font-weight:700;">127% <span class="coverage-dot" style="background:#22c55e;"></span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+<!-- SECTION: FAB UPSIDE -->
+<div class="section-lbl">FAB Upside Analysis</div>
 
-      <!-- Performance per Sales Person -->
-      <div class="card">
-        <div class="card-title">Performance per Sales Person <span>(Mei 2026)</span></div>
-        <table class="perf-table">
-          <thead>
-            <tr>
-              <th>Sales Person</th>
-              <th>Target (Rp)</th>
-              <th>Actual (Rp)</th>
-              <th>Forecast (Rp)</th>
-              <th>Coverage</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style="font-weight:600;">Budi Santoso</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">3.000.000.000</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">1.300.000.000</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">3.100.000.000</td>
-              <td style="font-weight:700;">103% <span class="coverage-dot" style="background:#22c55e;"></span></td>
-            </tr>
-            <tr>
-              <td style="font-weight:600;">Siti Rahayu</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.500.000.000</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">1.100.000.000</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.600.000.000</td>
-              <td style="font-weight:700;">104% <span class="coverage-dot" style="background:#22c55e;"></span></td>
-            </tr>
-            <tr>
-              <td style="font-weight:600;">Andi Wijaya</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.000.000.000</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">800.000.000</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">1.900.000.000</td>
-              <td style="font-weight:700;">95% <span class="coverage-dot" style="background:#f59e0b;"></span></td>
-            </tr>
-            <tr>
-              <td style="font-weight:600;">Dewi Lestari</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.500.000.000</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">1.000.000.000</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">2.900.000.000</td>
-              <td style="font-weight:700;">116% <span class="coverage-dot" style="background:#22c55e;"></span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+<div class="row-65">
+  <div class="card">
+    <div class="ct">FAB Upside Revenue by Month &amp; Channel (IDR Bn)</div>
+    <div style="position:relative;height:220px"><canvas id="fabChart" role="img"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="ct">FAB Upside by Product Group</div>
+    <div style="position:relative;height:220px"><canvas id="fabProdChart" role="img"></canvas></div>
+  </div>
+</div>
 
-      <!-- Top Pipeline by Value -->
-      <div class="card">
-        <div class="card-title">Top Pipeline by Value <span>(RFS This Month)</span></div>
-        <table class="perf-table">
-          <thead>
-            <tr>
-              <th>Pipeline</th>
-              <th>Account</th>
-              <th>RFS Date</th>
-              <th>Est. Value</th>
-              <th>Prob.</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0012</td>
-              <td>PT. Maju Bersama</td>
-              <td style="color:var(--text-3);font-size:10px;">10 Mei 2026</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 800.000.000</td>
-              <td style="color:var(--accent-green);font-weight:700;">90%</td>
-            </tr>
-            <tr>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0008</td>
-              <td>PT. Sukses Abadi</td>
-              <td style="color:var(--text-3);font-size:10px;">15 Mei 2026</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 650.000.000</td>
-              <td style="color:var(--accent-green);font-weight:700;">80%</td>
-            </tr>
-            <tr>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">PL-2405-0015</td>
-              <td>PT. Global Solusi</td>
-              <td style="color:var(--text-3);font-size:10px;">20 Mei 2026</td>
-              <td style="font-family:&#39;DM Mono&#39;,monospace;font-size:10px;">Rp 500.000.000</td>
-              <td style="color:var(--accent-yellow);font-weight:700;">70%</td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="see-all" style="margin-top:10px;">Lihat semua <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg></div>
-      </div>
-    </div>
+<div class="card" style="margin-bottom:12px">
+  <div class="ct" style="margin-bottom:10px">FAB Upside Detail — Top Entries</div>
+  <div style="overflow-x:auto">
+    <table class="fab-tbl" id="fab-detail-tbl">
+      <thead><tr>
+        <th>Month</th><th>Channel</th><th>Product Group</th>
+        <th style="text-align:right">Revenue (IDR Mn)</th><th>Share</th>
+      </tr></thead>
+      <tbody id="fab-detail-tbody"></tbody>
+    </table>
+  </div>
+</div>
 
-  </div><!-- /content -->
-</div><!-- /main -->
+<!-- SECTION: PRODUCT BREAKDOWN -->
+<div class="section-lbl">Product Performance</div>
+
+<div class="card" style="margin-bottom:12px">
+  <div class="ct" style="margin-bottom:10px">SFA Pipeline — Product × Channel Breakdown (MRC IDR Mn)</div>
+  <div style="overflow-x:auto">
+    <table class="ptbl" id="prod-tbl">
+      <thead id="prod-thead"></thead>
+      <tbody id="prod-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION: ACCOUNT PIPELINE TABLES -->
+<div class="section-lbl">Account-Level Pipeline Detail</div>
+
+<div class="acct-grid" id="acct-grid">
+  <!-- Built by JS -->
+</div>
+
+<div class="footer"><strong>Indosat Ooredoo Hutchison</strong> · Pipeline &amp; Upside Dashboard · Data Source: SFA Pipeline, FAB Upside, Baseline · Internal use only</div>
+</div>
+
 <script>
-  function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('sidebarOverlay').classList.toggle('open');
+/* ═══════════════════════════════════════
+   EMBEDDED DATA (from Excel analysis)
+═══════════════════════════════════════ */
+const CHANNELS = ['Sales Channel 1','Sales Channel 2','Sales Channel 3','Sales Channel 4'];
+const PRODUCTS = ['Data Analytics','Fixed Data','Fixed Voice','ICT','IOT','M2M','Mobile - Bulk','Mobile - Device','Mobile - Postpaid'];
+const STAGES   = ['1. Identify','2. Qualify','3. Develop','4. Value','5. Contract','6. Complete'];
+const MONTHS   = ['Apr-26','May-26','Jun-26','Jul-26','Aug-26','Sep-26'];
+const MO_NUMS  = [4,5,6,7,8,9];
+const CH_COLORS= ['#EC008C','#32BCAD','#FFCB05','#C6168D'];
+const ST_COLORS= ['#9B9A96','#FFCB05','#32BCAD','#C6168D','#ED1C24','#EC008C'];
+const PR_COLORS= ['#EC008C','#32BCAD','#FFCB05','#C6168D','#ED1C24','#4D4D4F','#0EA5E9','#F97316','#8B5CF6'];
+
+// SFA Pipeline: MRC by [channel][product][month_num][stage]  (IDR)
+const SFA = {
+  "Sales Channel 1":{
+    "Data Analytics":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":23000,"4. Value":0,"5. Contract":0,"6. Complete":70000},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":805,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Fixed Data":{4:{"1. Identify":69000,"2. Qualify":0,"3. Develop":414000,"4. Value":0,"5. Contract":0,"6. Complete":414000},5:{"1. Identify":230000,"2. Qualify":161019,"3. Develop":1104000,"4. Value":402500,"5. Contract":0,"6. Complete":173800},6:{"1. Identify":425980,"2. Qualify":80000,"3. Develop":345000,"4. Value":115000,"5. Contract":117300,"6. Complete":115000},7:{"1. Identify":115000,"2. Qualify":0,"3. Develop":138000,"4. Value":46000,"5. Contract":0,"6. Complete":16100},8:{"1. Identify":46000,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":40250,"2. Qualify":0,"3. Develop":97750,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Fixed Voice":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":345000,"4. Value":0,"5. Contract":0,"6. Complete":242075},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":172038},6:{"1. Identify":115000,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "ICT":{4:{"1. Identify":0,"2. Qualify":52800,"3. Develop":264750,"4. Value":63250,"5. Contract":16537,"6. Complete":1403600},5:{"1. Identify":195650,"2. Qualify":0,"3. Develop":2034000,"4. Value":345000,"5. Contract":0,"6. Complete":155196},6:{"1. Identify":2001500,"2. Qualify":0,"3. Develop":80000,"4. Value":0,"5. Contract":0,"6. Complete":63250},7:{"1. Identify":91540,"2. Qualify":83835,"3. Develop":0,"4. Value":57500,"5. Contract":172,"6. Complete":8050},8:{"1. Identify":0,"2. Qualify":26519,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":12645},9:{"1. Identify":0,"2. Qualify":41709,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":3023}},
+    "IOT":{4:{"1. Identify":46000,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":92000,"2. Qualify":0,"3. Develop":92000,"4. Value":138000,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":2300,"5. Contract":0,"6. Complete":0}},
+    "M2M":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":345000,"4. Value":92000,"5. Contract":0,"6. Complete":607566},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":46000,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":46000,"3. Develop":115000,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":115000,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Mobile - Bulk":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":69000,"4. Value":57500,"5. Contract":0,"6. Complete":1150000},5:{"1. Identify":69000,"2. Qualify":0,"3. Develop":460000,"4. Value":16100,"5. Contract":0,"6. Complete":0},6:{"1. Identify":75900,"2. Qualify":230000,"3. Develop":0,"4. Value":92000,"5. Contract":0,"6. Complete":46000},7:{"1. Identify":31050,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Mobile - Device":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":115000,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Mobile - Postpaid":{4:{"1. Identify":282376,"2. Qualify":0,"3. Develop":64492,"4. Value":0,"5. Contract":0,"6. Complete":8468050},5:{"1. Identify":43626,"2. Qualify":0,"3. Develop":147527,"4. Value":0,"5. Contract":0,"6. Complete":6295},6:{"1. Identify":95371,"2. Qualify":2246,"3. Develop":23199,"4. Value":56235,"5. Contract":0,"6. Complete":57316},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":172},8:{"1. Identify":10640,"2. Qualify":0,"3. Develop":0,"4. Value":14720,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}}
+  },
+  "Sales Channel 2":{
+    "Data Analytics":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Fixed Data":{4:{"1. Identify":69000,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":207000},5:{"1. Identify":69000,"2. Qualify":46000,"3. Develop":46000,"4. Value":0,"5. Contract":0,"6. Complete":184000},6:{"1. Identify":46000,"2. Qualify":46000,"3. Develop":115000,"4. Value":57500,"5. Contract":115000,"6. Complete":138000},7:{"1. Identify":69000,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":222083},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Fixed Voice":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "ICT":{4:{"1. Identify":164928,"2. Qualify":0,"3. Develop":183080,"4. Value":161920,"5. Contract":0,"6. Complete":1523177},5:{"1. Identify":221655,"2. Qualify":567755,"3. Develop":436770,"4. Value":75440,"5. Contract":11500,"6. Complete":179016},6:{"1. Identify":928612,"2. Qualify":1197150,"3. Develop":134928,"4. Value":16100,"5. Contract":9074,"6. Complete":16347},7:{"1. Identify":910493,"2. Qualify":129375,"3. Develop":11500,"4. Value":41400,"5. Contract":0,"6. Complete":69500},8:{"1. Identify":287117,"2. Qualify":11500,"3. Develop":0,"4. Value":0,"5. Contract":19550,"6. Complete":29677},9:{"1. Identify":314640,"2. Qualify":138000,"3. Develop":23000,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "IOT":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "M2M":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":322928},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Mobile - Bulk":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Mobile - Device":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Mobile - Postpaid":{4:{"1. Identify":69000,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":155},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}}
+  },
+  "Sales Channel 3":{
+    "Data Analytics":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":52900,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":258750,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Fixed Data":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":115000},5:{"1. Identify":46000,"2. Qualify":31050,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":115000,"4. Value":80500,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "ICT":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":28566,"4. Value":0,"5. Contract":0,"6. Complete":79943},5:{"1. Identify":60053,"2. Qualify":0,"3. Develop":71507,"4. Value":0,"5. Contract":0,"6. Complete":6463},6:{"1. Identify":253805,"2. Qualify":188600,"3. Develop":80500,"4. Value":46000,"5. Contract":1150,"6. Complete":36239},7:{"1. Identify":115000,"2. Qualify":0,"3. Develop":57980,"4. Value":0,"5. Contract":0,"6. Complete":1150},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "IOT":{4:{"1. Identify":24150,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "M2M":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Mobile - Bulk":{4:{"1. Identify":0,"2. Qualify":29900,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Fixed Voice":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":31050,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":29762,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":32200,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":29900,"3. Develop":119140,"4. Value":16100,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":136505,"3. Develop":18860,"4. Value":34500,"5. Contract":46000,"6. Complete":0}},
+    "Mobile - Device":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Mobile - Postpaid":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}}
+  },
+  "Sales Channel 4":{
+    "Data Analytics":{4:{"1. Identify":145231,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":112920,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":69000},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":118450,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":119600,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Fixed Data":{4:{"1. Identify":83400,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":350175},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":104540},6:{"1. Identify":92000,"2. Qualify":1104050,"3. Develop":460300,"4. Value":287750,"5. Contract":0,"6. Complete":46291},7:{"1. Identify":115000,"2. Qualify":549866,"3. Develop":230244,"4. Value":0,"5. Contract":0,"6. Complete":406137},8:{"1. Identify":0,"2. Qualify":295717,"3. Develop":43700,"4. Value":0,"5. Contract":0,"6. Complete":76538},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":213210,"5. Contract":0,"6. Complete":281635}},
+    "Fixed Voice":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":685,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":5750,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "ICT":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":115000,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":69174,"3. Develop":9200,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":3739,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "IOT":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "M2M":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":24380,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Mobile - Bulk":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":83334},5:{"1. Identify":69000,"2. Qualify":0,"3. Develop":0,"4. Value":253879,"5. Contract":0,"6. Complete":204045},6:{"1. Identify":0,"2. Qualify":115000,"3. Develop":455029,"4. Value":0,"5. Contract":0,"6. Complete":131600},7:{"1. Identify":690000,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":16100},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":11546,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Mobile - Device":{4:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":115000,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":11087,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},7:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}},
+    "Mobile - Postpaid":{4:{"1. Identify":667763,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},5:{"1. Identify":27075,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},6:{"1. Identify":0,"2. Qualify":78468,"3. Develop":0,"4. Value":40000,"5. Contract":6440,"6. Complete":3750},7:{"1. Identify":17561,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},8:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0},9:{"1. Identify":0,"2. Qualify":0,"3. Develop":0,"4. Value":0,"5. Contract":0,"6. Complete":0}}
   }
+};
+
+// FAB Upside by [month][channel][product]  (IDR)
+const FAB = {
+  "2026-01":{"Sales Channel 1":{"Data Analytics":33113517,"Fixed Data - MRC":33705885,"Fixed Voice":7357451,"ICT - MRC":15295710,"ICT - OTC":43545900,"IOT":7475000,"M2M":14015510,"Mobile - Bulk":161529883,"Mobile - Device":25463414,"Mobile - Postpaid":381340},"Sales Channel 2":{"Data Analytics":45655000,"Fixed Data - MRC":17113601,"ICT - MRC":92805000,"M2M":552000,"Mobile - Bulk":64975000},"Sales Channel 3":{"Data Analytics":15800417,"Fixed Data - MRC":6731438,"ICT - MRC":251156299,"IOT":77131009,"M2M":325850,"Mobile - Bulk":90799442,"Mobile - Device":172865278},"Sales Channel 4":{"Fixed Data - MRC":110400000}},
+  "2026-02":{"Sales Channel 1":{"Data Analytics":10258230,"Fixed Data - MRC":19333072,"Fixed Voice":6219200,"ICT - MRC":20024461,"ICT - OTC":3818000,"IOT":174639000,"M2M":6239900,"Mobile - Bulk":105501577,"Mobile - Device":14241270,"Mobile - Postpaid":73800},"Sales Channel 2":{"Data Analytics":26795000,"Fixed Data - MRC":28370862,"ICT - MRC":23108468,"IOT":266800000,"M2M":1338692,"Mobile - Bulk":98115721},"Sales Channel 3":{"Data Analytics":19549156,"Fixed Data - MRC":3842334,"ICT - MRC":226152057,"ICT - OTC":45439234,"IOT":31360307,"M2M":188897,"Mobile - Bulk":91455452,"Mobile - Device":1011273},"Sales Channel 4":{"Fixed Data - MRC":233381000}},
+  "2026-03":{"Sales Channel 1":{"Data Analytics":1582400,"Fixed Data - MRC":27170012,"ICT - MRC":109158470,"IOT":116691880,"M2M":17406400,"Mobile - Bulk":74295792,"Mobile - Device":13695513,"Mobile - Postpaid":1013426},"Sales Channel 2":{"Data Analytics":81765000,"Fixed Data - MRC":50503997,"Fixed Voice":92000,"ICT - MRC":623091035,"M2M":52003184,"Mobile - Bulk":115031081,"Mobile - Postpaid":5414499},"Sales Channel 3":{"Data Analytics":29510548,"Fixed Data - MRC":27087182,"ICT - MRC":229527725,"IOT":7857498,"M2M":873310,"Mobile - Bulk":91857055,"Mobile - Device":51133198,"Mobile - Postpaid":460000},"Sales Channel 4":{"Fixed Data - MRC":227028400,"ICT - MRC":2822100,"Mobile - Postpaid":2320700}},
+  "2026-04":{"Sales Channel 1":{"Fixed Data - MRC":12151497,"ICT - MRC":95224669,"ICT - OTC":6900000,"IOT":74175000,"M2M":260015,"Mobile - Bulk":43444514,"Mobile - Device":11028500,"Mobile - Postpaid":980122},"Sales Channel 2":{"Data Analytics":22218000,"Fixed Data - MRC":127319234,"Fixed Voice":12880000,"ICT - MRC":189582732,"ICT - OTC":7521000,"M2M":41433120,"Mobile - Bulk":105363000,"Mobile - Postpaid":575},"Sales Channel 3":{"Data Analytics":28881795,"Fixed Data - MRC":1040405,"ICT - MRC":260971888,"IOT":32846910,"M2M":528289,"Mobile - Bulk":69309371,"Mobile - Device":1716695,"Mobile - Postpaid":5263338},"Sales Channel 4":{"Fixed Data - MRC":70046500,"ICT - MRC":519800}},
+  "2026-05":{"Sales Channel 1":{"Data Analytics":46000,"Fixed Data - MRC":11542182,"Fixed Voice":1702000,"ICT - MRC":15992820,"ICT - OTC":5520000,"IOT":88550000,"Mobile - Device":1840000,"Mobile - Postpaid":23000},"Sales Channel 2":{"Fixed Data - MRC":52582600,"ICT - MRC":4200490,"M2M":3522523},"Sales Channel 3":{"Data Analytics":4419795,"Fixed Data - MRC":8390483,"ICT - MRC":227010903,"M2M":230000,"Mobile - Bulk":50025000,"Mobile - Device":12650},"Sales Channel 4":{"Fixed Data - MRC":12953600,"ICT - MRC":59800}},
+  "2026-06":{"Sales Channel 1":{"Fixed Data - MRC":1282604,"ICT - MRC":46000000,"Mobile - Device":9200000},"Sales Channel 2":{"Fixed Data - MRC":13800000,"ICT - MRC":4370000},"Sales Channel 3":{"Data Analytics":7218128,"Fixed Data - MRC":34155000,"ICT - MRC":229784628,"IOT":147197700,"M2M":230000,"Mobile - Bulk":46000000},"Sales Channel 4":{"Fixed Data - MRC":34224000}}
+};
+
+// Baseline (IDR) by month → group → source → product
+const BASELINE = {
+  "2026-04":{total_som:1883568200,total_sales:0,target:1980000000},
+  "2026-05":{total_som:3381003600,total_sales:0,target:3550000000},
+  "2026-06":{total_som:1231197000,total_sales:6422268400,target:6422268400}
+};
+
+const WF_DATA = {
+  "Apr-26":{base_bn:1.88,fab_bn:1.22,sfa_complete_mn:14.97,sfa_pipe_mn:3.36,target_bn:1.98,gap_bn:1.22+14.97/1000+3.36/1000-1.98},
+  "May-26":{base_bn:3.38,fab_bn:0.49,sfa_complete_mn:1.32,sfa_pipe_mn:8.30,target_bn:3.55,gap_bn:0.49+1.32/1000+8.30/1000-3.55},
+  "Jun-26":{base_bn:1.23,fab_bn:0.57,sfa_complete_mn:0.65,sfa_pipe_mn:10.91,target_bn:6.42,gap_bn:0.57+0.65/1000+10.91/1000-6.42}
+};
+
+/* ═══ COMPUTED DATA HELPERS ═══ */
+function getMRCForFilter(monthNums, channels, products){
+  let total=0,byStage={},byCh={},byProd={};
+  STAGES.forEach(s=>byStage[s]=0);
+  CHANNELS.forEach(c=>byCh[c]=0);
+  PRODUCTS.forEach(p=>byProd[p]=0);
+  channels.forEach(ch=>{
+    products.forEach(pr=>{
+      monthNums.forEach(mo=>{
+        STAGES.forEach(st=>{
+          const v=(SFA[ch]?.[pr]?.[mo]?.[st])||0;
+          total+=v; byStage[st]+=v; byCh[ch]+=v; byProd[pr]+=v;
+        });
+      });
+    });
+  });
+  return{total,byStage,byCh,byProd};
+}
+
+function getFABForFilter(months, channels){
+  let total=0,byCh={},byProd={};
+  channels.forEach(ch=>{byCh[ch]=0});
+  months.forEach(mo=>{
+    channels.forEach(ch=>{
+      const prods=FAB[mo]?.[ch]||{};
+      Object.entries(prods).forEach(([pr,v])=>{
+        total+=v; byCh[ch]=(byCh[ch]||0)+v;
+        byProd[pr]=(byProd[pr]||0)+v;
+      });
+    });
+  });
+  return{total,byCh,byProd};
+}
+
+/* ═══ STATE ═══ */
+const MONTH_MAP = {0:[4],1:[5],2:[6],'all':[4,5,6]};
+const MO_LABEL_MAP = {0:'Apr-26',1:'May-26',2:'Jun-26','all':'Apr–Jun 26'};
+const FAB_MO_MAP  = {0:['2026-04'],1:['2026-05'],2:['2026-06'],'all':['2026-04','2026-05','2026-06']};
+
+let activePeriod='0', activeChannel='All', activeProduct='All', activeWFMonth='Apr-26';
+let charts={};
+
+/* ═══ CHART INSTANCES ═══ */
+function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
+
+/* ═══ KPI CARDS ═══ */
+function buildKPIs(){
+  const mos = MONTH_MAP[activePeriod];
+  const chs = activeChannel==='All'?CHANNELS:[activeChannel];
+  const prs = activeProduct==='All'?PRODUCTS:[activeProduct];
+  const sfa_data = getMRCForFilter(mos,chs,prs);
+  const fab_data = getFABForFilter(FAB_MO_MAP[activePeriod],chs);
+
+  const totalMRC  = sfa_data.total;
+  const complete  = sfa_data.byStage['6. Complete'];
+  const pipeline  = totalMRC - complete;
+  const fabTotal  = fab_data.total;
+  const topCh     = Object.entries(sfa_data.byCh).sort((a,b)=>b[1]-a[1])[0];
+
+  document.getElementById('kpi-grid').innerHTML=`
+    <div class="kpi"><div class="kpi-lbl">Total Pipeline MRC</div><div class="kpi-val">${fmt(totalMRC)}</div><div class="kpi-sub">IDR · ${MO_LABEL_MAP[activePeriod]}</div><span class="kpi-badge badge-neu">SFA All Stages</span></div>
+    <div class="kpi"><div class="kpi-lbl">Completed (Won)</div><div class="kpi-val">${fmt(complete)}</div><div class="kpi-sub">Stage 6 – Closed</div><span class="kpi-badge badge-up">▲ Closed</span></div>
+    <div class="kpi"><div class="kpi-lbl">Active Pipeline</div><div class="kpi-val">${fmt(pipeline)}</div><div class="kpi-sub">Stages 1–5</div><span class="kpi-badge badge-neu">${pct(pipeline,totalMRC)}% of total</span></div>
+    <div class="kpi"><div class="kpi-lbl">FAB Upside</div><div class="kpi-val">${fmtBn(fabTotal)}</div><div class="kpi-sub">IDR Bn in-month</div><span class="kpi-badge badge-up">Upside Revenue</span></div>
+    <div class="kpi"><div class="kpi-lbl">Top Channel</div><div class="kpi-val" style="font-size:14px;font-weight:700">${topCh?topCh[0]:'–'}</div><div class="kpi-sub">${topCh?fmt(topCh[1]):''} MRC</div><span class="kpi-badge badge-pk" style="background:#FCE7F3;color:#9D174D">${topCh?pct(topCh[1],totalMRC)+'%':''}</span></div>
+  `;
+}
+
+/* ═══ FUNNEL BARS ═══ */
+function buildFunnel(){
+  const mos = MONTH_MAP[activePeriod];
+  const chs = activeChannel==='All'?CHANNELS:[activeChannel];
+  const prs = activeProduct==='All'?PRODUCTS:[activeProduct];
+  const d = getMRCForFilter(mos,chs,prs);
+  const maxVal = Math.max(...Object.values(d.byStage));
+  const stColors=['#9B9A96','#FFCB05','#32BCAD','#C6168D','#ED1C24','#EC008C'];
+  document.getElementById('funnel-bars').innerHTML=STAGES.map((st,i)=>{
+    const v=d.byStage[st];
+    const w=maxVal>0?Math.max(3,v/maxVal*100):0;
+    return`<div class="funnel-row">
+      <div class="funnel-lbl">${st}</div>
+      <div class="funnel-track"><div class="funnel-fill" style="width:${w}%;background:${stColors[i]}"><span>${v>0?fmtK(v):''}</span></div></div>
+      <div class="funnel-val">${fmtMn(v)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══ TREND CHART ═══ */
+function buildTrend(){
+  const chs=activeChannel==='All'?CHANNELS:[activeChannel];
+  const prs=activeProduct==='All'?PRODUCTS:[activeProduct];
+  const vals=MO_NUMS.map(mo=>getMRCForFilter([mo],chs,prs).total/1e6);
+  destroyChart('trend');
+  charts.trend=new Chart(document.getElementById('trendChart'),{
+    type:'line',
+    data:{labels:MONTHS,datasets:[{label:'MRC (IDR Mn)',data:vals,borderColor:'#EC008C',backgroundColor:'rgba(236,0,140,0.08)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#EC008C',fill:true,tension:.4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10},color:'#9B9A96'},grid:{display:false},border:{display:false}},y:{ticks:{callback:v=>v.toFixed(0)+'M',font:{size:10},color:'#9B9A96'},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false}}}}
+  });
+}
+
+/* ═══ CHANNEL STACKED BAR ═══ */
+function buildChannelChart(){
+  const mos=MONTH_MAP[activePeriod];
+  const prs=activeProduct==='All'?PRODUCTS:[activeProduct];
+  const chs=activeChannel==='All'?CHANNELS:[activeChannel];
+  const datasets=STAGES.map((st,i)=>({
+    label:st,
+    data:chs.map(ch=>getMRCForFilter(mos,[ch],prs).byStage[st]/1e6),
+    backgroundColor:['#9B9A96','#FFCB05','#32BCAD','#C6168D','#ED1C24','#EC008C'][i],
+    borderRadius:2,stack:'s'
+  }));
+  destroyChart('channel');
+  charts.channel=new Chart(document.getElementById('channelChart'),{
+    type:'bar',
+    data:{labels:chs.map(c=>c.replace('Sales Channel ','Ch ')),datasets},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{stacked:true,ticks:{font:{size:11},color:'#9B9A96'},grid:{display:false},border:{display:false}},y:{stacked:true,ticks:{callback:v=>v+'M',font:{size:10},color:'#9B9A96'},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false}}}}
+  });
+}
+
+/* ═══ PRODUCT CHART ═══ */
+function buildProductChart(){
+  const mos=MONTH_MAP[activePeriod];
+  const chs=activeChannel==='All'?CHANNELS:[activeChannel];
+  const prs=activeProduct==='All'?PRODUCTS:[activeProduct];
+  const d=getMRCForFilter(mos,chs,prs);
+  const sorted=prs.map(p=>({p,v:d.byProd[p]||0})).sort((a,b)=>b.v-a.v).filter(x=>x.v>0);
+  destroyChart('product');
+  charts.product=new Chart(document.getElementById('productChart'),{
+    type:'bar',
+    data:{labels:sorted.map(x=>x.p),datasets:[{label:'MRC (IDR Mn)',data:sorted.map(x=>x.v/1e6),backgroundColor:sorted.map((_,i)=>PR_COLORS[i%PR_COLORS.length]),borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>v+'M',font:{size:10},color:'#9B9A96'},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false}},y:{ticks:{font:{size:10},color:'#9B9A96'},grid:{display:false},border:{display:false}}}}
+  });
+}
+
+/* ═══ FAB CHART ═══ */
+function buildFABChart(){
+  const chs=activeChannel==='All'?CHANNELS:[activeChannel];
+  const fabMos=['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06'];
+  const moLabels=['Jan-26','Feb-26','Mar-26','Apr-26','May-26','Jun-26'];
+  const datasets=chs.map((ch,i)=>({
+    label:ch.replace('Sales Channel ','Ch '),
+    data:fabMos.map(mo=>Object.values(FAB[mo]?.[ch]||{}).reduce((a,b)=>a+b,0)/1e9),
+    backgroundColor:CH_COLORS[i],borderRadius:3,stack:'s'
+  }));
+  destroyChart('fab');
+  charts.fab=new Chart(document.getElementById('fabChart'),{
+    type:'bar',
+    data:{labels:moLabels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:10,padding:8}}},scales:{x:{stacked:true,ticks:{font:{size:10},color:'#9B9A96'},grid:{display:false},border:{display:false}},y:{stacked:true,ticks:{callback:v=>v.toFixed(1)+'B',font:{size:10},color:'#9B9A96'},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false}}}}
+  });
+}
+
+/* ═══ FAB PRODUCT DONUT ═══ */
+function buildFABProductChart(){
+  const chs=activeChannel==='All'?CHANNELS:[activeChannel];
+  const allFABMos=Object.keys(FAB);
+  const byProd={};
+  allFABMos.forEach(mo=>chs.forEach(ch=>Object.entries(FAB[mo]?.[ch]||{}).forEach(([pr,v])=>byProd[pr]=(byProd[pr]||0)+v)));
+  const sorted=Object.entries(byProd).sort((a,b)=>b[1]-a[1]);
+  destroyChart('fabprod');
+  charts.fabprod=new Chart(document.getElementById('fabProdChart'),{
+    type:'doughnut',
+    data:{labels:sorted.map(x=>x[0]),datasets:[{data:sorted.map(x=>x[1]/1e9),backgroundColor:PR_COLORS,borderWidth:2,borderColor:'#fff',hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'right',labels:{font:{size:10},boxWidth:10,padding:6}}}}
+  });
+}
+
+/* ═══ FAB DETAIL TABLE ═══ */
+function buildFABTable(){
+  const chs=activeChannel==='All'?CHANNELS:[activeChannel];
+  const fabMos=FAB_MO_MAP[activePeriod];
+  const moLabelMap={'2026-01':'Jan-26','2026-02':'Feb-26','2026-03':'Mar-26','2026-04':'Apr-26','2026-05':'May-26','2026-06':'Jun-26'};
+  let rows=[];
+  fabMos.forEach(mo=>chs.forEach(ch=>Object.entries(FAB[mo]?.[ch]||{}).forEach(([pr,v])=>rows.push({mo:moLabelMap[mo]||mo,ch,pr,v}))));
+  rows.sort((a,b)=>b.v-a.v);
+  const grandTotal=rows.reduce((s,r)=>s+r.v,0);
+  const top20=rows.slice(0,20);
+  const chPills={'Sales Channel 1':'pill-pk','Sales Channel 2':'pill-tl','Sales Channel 3':'pill-yw','Sales Channel 4':'pill-pu'};
+  document.getElementById('fab-detail-tbody').innerHTML=top20.map(r=>`
+    <tr>
+      <td>${r.mo}</td>
+      <td><span class="pill ${chPills[r.ch]||'pill-gy'}">${r.ch.replace('Sales Channel ','Ch ')}</span></td>
+      <td>${r.pr}</td>
+      <td style="text-align:right;font-family:'DM Mono',monospace;font-weight:500">${(r.v/1e6).toFixed(1)}</td>
+      <td><div class="mb-wrap"><div class="mb-bg"><div class="mb-fill" style="width:${(r.v/grandTotal*100*20).toFixed(0)}%;background:#32BCAD"></div></div><span style="font-size:10px;color:var(--t3)">${(r.v/grandTotal*100).toFixed(1)}%</span></div></td>
+    </tr>`).join('');
+}
+
+/* ═══ PRODUCT × CHANNEL TABLE ═══ */
+function buildProductTable(){
+  const mos=MONTH_MAP[activePeriod];
+  const chs=activeChannel==='All'?CHANNELS:[activeChannel];
+  const prs=activeProduct==='All'?PRODUCTS:[activeProduct];
+  // Header
+  document.getElementById('prod-thead').innerHTML=`<tr><th>Product</th>${chs.map(c=>`<th style="text-align:right">${c.replace('Sales Channel ','Ch ')}</th>`).join('')}<th style="text-align:right">Total</th></tr>`;
+  const chPrTotals={};
+  prs.forEach(pr=>{
+    chPrTotals[pr]={};
+    chs.forEach(ch=>{
+      chPrTotals[pr][ch]=getMRCForFilter(mos,[ch],[pr]).total;
+    });
+  });
+  const sorted=[...prs].sort((a,b)=>{
+    const ta=chs.reduce((s,c)=>s+chPrTotals[a][c],0);
+    const tb=chs.reduce((s,c)=>s+chPrTotals[b][c],0);
+    return tb-ta;
+  });
+  const grandMax=Math.max(...sorted.map(pr=>chs.reduce((s,c)=>s+chPrTotals[pr][c],0)));
+  document.getElementById('prod-tbody').innerHTML=sorted.map(pr=>{
+    const total=chs.reduce((s,c)=>s+chPrTotals[pr][c],0);
+    if(total===0) return '';
+    return`<tr>
+      <td style="font-weight:600">${pr}</td>
+      ${chs.map(ch=>`<td style="text-align:right;font-family:'DM Mono',monospace">${fmtMn(chPrTotals[pr][ch])}</td>`).join('')}
+      <td style="text-align:right"><div class="mb-wrap"><div class="mb-bg"><div class="mb-fill" style="width:${(total/grandMax*100).toFixed(0)}%;background:#EC008C"></div></div><span style="font-family:'DM Mono',monospace;font-size:11px">${fmtMn(total)}</span></div></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══ TOOLTIP ENGINE ═══ */
+const TT = document.getElementById('hover-tooltip');
+function ttShow(html,e){ TT.innerHTML=html; TT.classList.add('visible'); ttMove(e); }
+function ttHide(){ TT.classList.remove('visible'); }
+function ttMove(e){
+  const margin=14, w=TT.offsetWidth||240, h=TT.offsetHeight||120;
+  let x=e.clientX+margin, y=e.clientY+margin;
+  if(x+w>window.innerWidth-8)  x=e.clientX-w-margin;
+  if(y+h>window.innerHeight-8) y=e.clientY-h-margin;
+  TT.style.left=x+'px'; TT.style.top=y+'px';
+}
+document.addEventListener('mousemove',e=>{if(TT.classList.contains('visible'))ttMove(e);});
+function ttRow(l,v,c){ return`<div class="tt-row"><span class="tt-lbl">${l}</span><span class="tt-val" style="color:${c||'#fff'}">${v}</span></div>`; }
+function ttBarRow(l,v,max,c){
+  const w=max>0?Math.round(v/max*100):0;
+  return`<div class="tt-row"><span class="tt-lbl">${l}</span><span class="tt-val" style="color:${c||'#fff'}">${v}</span></div><div class="tt-bar"><div class="tt-bar-fill" style="width:${w}%;background:${c||'#fff'}"></div></div>`;
+}
+
+/* ═══ KPI HOVER ═══ */
+function attachKPIHover(){
+  document.querySelectorAll('.kpi').forEach(card=>{
+    card.addEventListener('mouseenter',e=>{
+      const lbl=card.querySelector('.kpi-lbl')?.textContent||'';
+      const val=card.querySelector('.kpi-val')?.textContent||'';
+      const mos=MONTH_MAP[activePeriod], chs=activeChannel==='All'?CHANNELS:[activeChannel], prs=activeProduct==='All'?PRODUCTS:[activeProduct];
+      let detail='';
+      if(lbl.includes('Pipeline')||lbl.includes('Active')||lbl.includes('Completed')){
+        const d=getMRCForFilter(mos,chs,prs);
+        const mx=Math.max(...Object.values(d.byStage));
+        detail='<hr class="tt-sep">'+STAGES.map((s,i)=>ttBarRow(s,fmtMn(d.byStage[s]),mx,['#9B9A96','#FFCB05','#32BCAD','#C6168D','#ED1C24','#EC008C'][i])).join('');
+      } else if(lbl.includes('FAB')){
+        const fd=getFABForFilter(FAB_MO_MAP[activePeriod],chs);
+        const mx=Math.max(...Object.values(fd.byCh));
+        detail='<hr class="tt-sep">'+Object.entries(fd.byCh).filter(([,v])=>v>0).map(([ch,v],i)=>ttBarRow(ch.replace('Sales Channel ','Ch '),fmtBn(v),mx,CH_COLORS[i])).join('');
+      } else if(lbl.includes('Channel')){
+        const d=getMRCForFilter(mos,chs,prs);
+        const mx=Math.max(...Object.values(d.byCh));
+        detail='<hr class="tt-sep">'+Object.entries(d.byCh).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([ch,v],i)=>ttBarRow(ch.replace('Sales Channel ','Ch '),fmtMn(v),mx,CH_COLORS[i])).join('');
+      }
+      ttShow(`<div class="tt-title">${lbl}</div>${ttRow('Value',val,'#FFCB05')}${detail}`,e);
+    });
+    card.addEventListener('mouseleave',ttHide);
+  });
+}
+
+/* ═══ FUNNEL HOVER ═══ */
+function attachFunnelHover(){
+  document.querySelectorAll('.funnel-row').forEach((row,i)=>{
+    row.addEventListener('mouseenter',e=>{
+      const st=STAGES[i];
+      const mos=MONTH_MAP[activePeriod], chs=activeChannel==='All'?CHANNELS:[activeChannel], prs=activeProduct==='All'?PRODUCTS:[activeProduct];
+      const byChSt={}, byPrSt={};
+      CHANNELS.forEach(ch=>{ let v=0; prs.forEach(pr=>mos.forEach(mo=>{v+=(SFA[ch]?.[pr]?.[mo]?.[st])||0;})); byChSt[ch]=v; });
+      PRODUCTS.forEach(pr=>{ let v=0; chs.forEach(ch=>mos.forEach(mo=>{v+=(SFA[ch]?.[pr]?.[mo]?.[st])||0;})); if(v>0) byPrSt[pr]=v; });
+      const total=Object.values(byChSt).reduce((a,b)=>a+b,0);
+      const mxCh=Math.max(...Object.values(byChSt),1), mxPr=Math.max(...Object.values(byPrSt),1);
+      const stColor=['#9B9A96','#FFCB05','#32BCAD','#C6168D','#ED1C24','#EC008C'][i];
+      const chD=Object.entries(byChSt).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([ch,v],ci)=>ttBarRow(ch.replace('Sales Channel ','Ch '),fmtMn(v),mxCh,CH_COLORS[ci])).join('');
+      const prD=Object.entries(byPrSt).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([pr,v],pi)=>ttBarRow(pr,fmtMn(v),mxPr,PR_COLORS[pi])).join('');
+      ttShow(`<div class="tt-title" style="color:${stColor}">${st}</div>${ttRow('Total MRC',fmtMn(total),stColor)}<hr class="tt-sep"><div style="font-size:10px;color:rgba(255,255,255,0.45);margin-bottom:4px">BY CHANNEL</div>${chD}${prD?`<hr class="tt-sep"><div style="font-size:10px;color:rgba(255,255,255,0.45);margin-bottom:4px">TOP PRODUCTS</div>${prD}`:''}`,e);
+    });
+    row.addEventListener('mouseleave',ttHide);
+  });
+}
+
+/* ═══ ACCOUNT ROW HOVER ═══ */
+function attachAccountHover(){
+  document.querySelectorAll('.acct-tbl tbody tr:not(.acct-others)').forEach(row=>{
+    row.addEventListener('mouseenter',e=>{
+      const cells=row.querySelectorAll('td');
+      if(cells.length<7) return;
+      const name=cells[1]?.querySelector('.acct-name')?.textContent?.trim()||'';
+      const service=cells[1]?.querySelector('.acct-service')?.textContent?.trim()||'';
+      const tcv=cells[2]?.textContent?.trim(), apr=cells[3]?.textContent?.trim(), may=cells[4]?.textContent?.trim(), jun=cells[5]?.textContent?.trim();
+      const remark=cells[6]?.textContent?.trim()||'';
+      const total=[apr,may,jun].filter(v=>v&&v!=='–').reduce((s,v)=>s+(parseFloat(v)||0),0);
+      ttShow(`<div class="tt-title">${name}</div>${service?`<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-bottom:6px">${service}</div>`:''
+      }${ttRow('TCV',tcv+'B','#FFCB05')}<hr class="tt-sep"
+      >${apr&&apr!=='–'?ttRow('Apr',apr+'B','#EC008C'):''}${may&&may!=='–'?ttRow('May',may+'B','#32BCAD'):''}${jun&&jun!=='–'?ttRow('Jun',jun+'B','#C6168D'):''
+      }${total>0?ttRow('Total billed',total.toFixed(1)+'B','#FFCB05'):''}<hr class="tt-sep"><div style="font-size:11px;color:rgba(255,255,255,0.65);font-style:italic">${remark}</div>`,e);
+    });
+    row.addEventListener('mouseleave',ttHide);
+  });
+}
+
+/* ═══ WATERFALL SVG with hover ═══ */
+function buildWaterfall(month){
+  const d=WF_DATA[month];
+  const W=700,H=310,padL=34,padR=30,padT=52,padB=52;
+  const chartW=W-padL-padR, chartH=H-padT-padB;
+  const base=d.base_bn, fab=d.fab_bn, sfc=d.sfa_complete_mn/1000, sfp=d.sfa_pipe_mn/1000;
+  const fcTotal=base+fab+sfc+sfp, target=d.target_bn, gap=+(fcTotal-target).toFixed(2);
+
+  const mos=MONTH_MAP[activePeriod], chs=activeChannel==='All'?CHANNELS:[activeChannel], prs=activeProduct==='All'?PRODUCTS:[activeProduct];
+  const sfaAll=getMRCForFilter(mos,chs,prs);
+  const fabData=getFABForFilter(FAB_MO_MAP[activePeriod],chs);
+
+  const colDefs=[
+    {key:'base',  lbl:'Baseline\n(MRC)', type:'abs',    val:base,    color:'#4D4D4F', subLabel:`${base}B`,
+     hd:{title:'Baseline (MRC)',color:'#4D4D4F',rows:[{l:'SOM ver total',v:base+'B',c:'#fff'},{l:'Period',v:month,c:'rgba(255,255,255,0.55)'}]}},
+    {key:'fab',   lbl:'FAB\nUpside',     type:'pos',    val:fab,     color:'#32BCAD', subLabel:`+${fab}B`,
+     hd:{title:'FAB Upside',color:'#32BCAD',rows:[{l:'Total',v:fab+'B',c:'#32BCAD'}],
+         barRows:Object.entries(fabData.byCh).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([ch,v],i)=>({l:ch.replace('Sales Channel ','Ch '),v,max:fabData.total,c:CH_COLORS[i]}))}},
+    {key:'sfa_c', lbl:'SFA\nComplete',  type:'pos',    val:sfc,     color:'#EC008C', subLabel:`+${d.sfa_complete_mn}M`,
+     hd:{title:'SFA Completed (Won)',color:'#EC008C',rows:[{l:'Total MRC',v:fmtMn(sfaAll.byStage['6. Complete']),c:'#EC008C'}],
+         barRows:Object.entries(sfaAll.byCh).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).map(([ch,v],i)=>({l:ch.replace('Sales Channel ','Ch '),v,max:sfaAll.byStage['6. Complete'],c:CH_COLORS[i]}))}},
+    {key:'sfa_p', lbl:'SFA\nPipeline',  type:'pos',    val:sfp,     color:'#C6168D', subLabel:`+${d.sfa_pipe_mn}M`,
+     hd:{title:'SFA Active Pipeline',color:'#C6168D',rows:[{l:'Total MRC Stages 1–5',v:fmtMn(sfaAll.total-sfaAll.byStage['6. Complete']),c:'#C6168D'}],
+         stageRows:STAGES.slice(0,5).map((s,i)=>({s,v:sfaAll.byStage[s],c:['#9B9A96','#FFCB05','#32BCAD','#C6168D','#ED1C24'][i]}))}},
+    {key:'fc',    lbl:month+'\nFC',      type:'abs',    val:fcTotal, color:'#EC008C', subLabel:fcTotal.toFixed(2)+'B',
+     hd:{title:`${month} Forecast Total`,color:'#EC008C',rows:[{l:'Baseline',v:base+'B',c:'#4D4D4F'},{l:'+FAB',v:fab+'B',c:'#32BCAD'},{l:'+SFA Closed',v:d.sfa_complete_mn+'M',c:'#EC008C'},{l:'+SFA Pipeline',v:d.sfa_pipe_mn+'M',c:'#C6168D'},{l:'= FC Total',v:fcTotal.toFixed(2)+'B',c:'#FFCB05'}]}},
+    {key:'target',lbl:month+'\nTarget',  type:'target', val:target,  subLabel:target+'B',
+     hd:{title:`${month} Target`,color:'#aaa',rows:[{l:'Target',v:target+'B',c:'#fff'},{l:'Gap',v:(gap>0?'+':'')+gap.toFixed(2)+'B',c:gap>=0?'#32BCAD':'#ED1C24'},{l:'Attainment',v:((fcTotal/target)*100).toFixed(1)+'%',c:gap>=0?'#32BCAD':'#ED1C24'}]}},
+  ];
+
+  const yMax=Math.ceil((Math.max(base,fab,sfc,sfp,fcTotal,target)+0.6)*2)/2;
+  const n=colDefs.length, colW=chartW/n, barW=colW*0.52, bgap=(colW-barW)/2;
+  function toY(v){return padT+chartH-(v/yMax)*chartH;}
+  function toX(i){return padL+i*colW+bgap;}
+
+  let running=0;
+  const bars=colDefs.map((c,i)=>{
+    let fb,ft;
+    if(c.type==='abs'||c.type==='target'){fb=0;ft=c.val;running=c.val;}
+    else{fb=running;ft=running+c.val;running=ft;}
+    return{...c,fb,ft,i};
+  });
+
+  const C_TEXT='#1A1A18',C_MUTED='#9B9A96',C_GRID='rgba(0,0,0,0.07)',C_DASH='rgba(0,0,0,0.2)';
+  let svg=`<svg id="wf-svg" viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family:'Plus Jakarta Sans',sans-serif">`;
+
+  const step=yMax<=4?0.5:1;
+  for(let v=0;v<=yMax;v+=step){
+    const y=toY(v);
+    svg+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="${C_GRID}" stroke-width="0.5"/>`;
+    svg+=`<text x="${padL-5}" y="${y+4}" text-anchor="end" font-size="9" fill="${C_MUTED}" font-family="DM Mono,monospace">${v}B</text>`;
+  }
+  svg+=`<line x1="${padL}" y1="${toY(0)}" x2="${W-padR}" y2="${toY(0)}" stroke="rgba(0,0,0,0.15)" stroke-width="1"/>`;
+
+  for(let i=0;i<bars.length-1;i++){
+    const curr=bars[i],next=bars[i+1];
+    const connY=next.type==='pos'?toY(next.fb):toY(curr.ft);
+    svg+=`<line x1="${toX(i)+barW}" y1="${connY}" x2="${toX(i+1)}" y2="${connY}" stroke="${C_DASH}" stroke-width="1" stroke-dasharray="4 3" pointer-events="none"/>`;
+  }
+
+  bars.forEach(b=>{
+    const x=toX(b.i),bh=Math.abs(toY(b.fb)-toY(b.ft)),by=Math.min(toY(b.ft),toY(b.fb)),cx=x+barW/2;
+    const gId=`wfb-${b.i}`;
+    svg+=`<g class="wf-bar-group" id="${gId}" data-key="${b.key}">`;
+    if(b.type==='target'){
+      const hId=`hp${month.replace(/\W/g,'')}${b.i}`;
+      svg+=`<defs><pattern id="${hId}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="rgba(100,100,110,0.35)" stroke-width="2.5"/></pattern></defs>`;
+      svg+=`<rect x="${x}" y="${by}" width="${barW}" height="${bh}" rx="2" fill="url(#${hId})" stroke="#aaa" stroke-width="0.8"/>`;
+    } else {
+      svg+=`<rect x="${x}" y="${by}" width="${barW}" height="${Math.max(bh,2)}" rx="2" fill="${b.color}"/>`;
+      if(bh>6) svg+=`<rect x="${x}" y="${by}" width="${barW}" height="5" rx="2" fill="rgba(255,255,255,0.18)"/>`;
+    }
+    svg+=`<rect x="${x-5}" y="${Math.min(by,toY(0))-5}" width="${barW+10}" height="${Math.max(bh,toY(0)-by)+10}" fill="transparent"/>`;
+    svg+=`<text x="${cx}" y="${by-8}" text-anchor="middle" font-size="11" font-weight="700" fill="${C_TEXT}">${b.subLabel}</text>`;
+    svg+=`</g>`;
+  });
+
+  // Gap bracket
+  const fc=bars[4],tg=bars[5];
+  const fcTopY=toY(fc.ft),tgTopY=toY(tg.ft);
+  const bkX=(toX(4)+barW+toX(5))/2,midY=(fcTopY+tgTopY)/2;
+  svg+=`<g pointer-events="none">
+    <line x1="${toX(4)+barW/2}" y1="${fcTopY}" x2="${bkX}" y2="${fcTopY}" stroke="#444" stroke-width="1.5"/>
+    <line x1="${toX(5)+barW/2}" y1="${tgTopY}" x2="${bkX}" y2="${tgTopY}" stroke="#444" stroke-width="1.5"/>
+    <line x1="${bkX}" y1="${fcTopY}" x2="${bkX}" y2="${tgTopY}" stroke="#444" stroke-width="1.5"/>
+    <polygon points="${bkX-4},${fcTopY+(gap<0?1:-1)*8} ${bkX+4},${fcTopY+(gap<0?1:-1)*8} ${bkX},${fcTopY+(gap<0?1:-1)*2}" fill="#444"/>
+    <circle cx="${bkX}" cy="${midY}" r="17" fill="${gap>=0?'#CCFBF1':'#FEE2E2'}" stroke="${gap>=0?'#32BCAD':'#ED1C24'}" stroke-width="2.5"/>
+    <text x="${bkX}" y="${midY+4}" text-anchor="middle" font-size="10" font-weight="800" fill="${gap>=0?'#32BCAD':'#ED1C24'}">${gap>0?'+':''}${gap.toFixed(1)}B</text>
+  </g>`;
+
+  colDefs.forEach((c,i)=>{
+    const lx=toX(i)+barW/2;
+    c.lbl.split('\n').forEach((line,li)=>svg+=`<text x="${lx}" y="${H-padB+18+li*13}" text-anchor="middle" font-size="10" fill="${C_MUTED}" font-weight="500">${line}</text>`);
+  });
+  svg+=`</svg>`;
+  document.getElementById('wf-svg-wrap').innerHTML=svg;
+
+  // Attach bar hover — rich table tooltips
+  bars.forEach(b=>{
+    const gEl=document.getElementById(`wfb-${b.i}`);
+    if(!gEl) return;
+    gEl.style.cursor='pointer';
+
+    gEl.addEventListener('mouseenter',e=>{
+      document.querySelectorAll('.wf-bar-group').forEach(g=>{ if(g!==gEl) g.classList.add('dimmed'); });
+
+      // Recompute live data for each bar type
+      const moKey = {'Apr-26':'2026-04','May-26':'2026-05','Jun-26':'2026-06'}[month]||'2026-04';
+      const activeChs  = activeChannel==='All'?CHANNELS:[activeChannel];
+      const activePrs  = activeProduct==='All'?PRODUCTS:[activeProduct];
+      const moNum      = {'Apr-26':4,'May-26':5,'Jun-26':6}[month]||4;
+      const sfaAllMos  = getMRCForFilter([moNum], activeChs, activePrs);
+      const activePipe = STAGES.slice(0,5).reduce((s,st)=>s+sfaAllMos.byStage[st],0);
+      const fabMoData  = FAB[moKey]||{};
+      let html='';
+
+      /* ── TABLE TOOLTIP BUILDER ── */
+      function ttTable(title,color,sections){
+        let h=`<div class="tt-hdr" style="border-color:${color}">
+          <span class="tt-hdr-dot" style="background:${color}"></span>
+          <span class="tt-hdr-title">${title}</span>
+        </div>`;
+        sections.forEach(sec=>{
+          if(sec.heading) h+=`<div class="tt-sec-hdr">${sec.heading}</div>`;
+          if(sec.rows && sec.rows.length){
+            h+=`<table class="tt-tbl">`;
+            if(sec.headers) h+=`<thead><tr>${sec.headers.map(hh=>`<th>${hh}</th>`).join('')}</tr></thead>`;
+            h+=`<tbody>`;
+            sec.rows.forEach(r=>{
+              const isTotal=r.isTotal;
+              h+=`<tr class="${isTotal?'tt-total-row':''}">
+                <td class="tt-td-lbl">${r.dot?`<span class="tt-dot" style="background:${r.dot}"></span>`:''}${r.label}</td>
+                ${r.values.map((v,vi)=>`<td class="tt-td-val" style="color:${r.colors?.[vi]||'#e8e6e0'}">${v}</td>`).join('')}
+              </tr>`;
+              if(r.bar){
+                const w=r.bar.max>0?Math.min(100,r.bar.val/r.bar.max*100):0;
+                h+=`<tr class="tt-bar-row"><td colspan="${1+(r.values?.length||0)}">
+                  <div class="tt-inline-bar"><div style="width:${w.toFixed(0)}%;background:${r.bar.color||r.dot||'#888'}"></div></div>
+                </td></tr>`;
+              }
+            });
+            h+=`</tbody></table>`;
+          }
+          if(sec.note) h+=`<div class="tt-note">${sec.note}</div>`;
+        });
+        return h;
+      }
+
+      /* ── PER-BAR TOOLTIP CONTENT ── */
+      if(b.key==='base'){
+        html=ttTable('Baseline (MRC)',b.color,[
+          {heading:'PERIOD SUMMARY',rows:[
+            {label:'Month',values:[month],colors:['rgba(255,255,255,0.55)']},
+            {label:'SOM Version',values:[base+'B'],colors:['#FFCB05']},
+            {label:'Contribution',values:[(base/target*100).toFixed(1)+'%'],colors:['rgba(255,255,255,0.6)']},
+          ]},
+          {note:'Committed recurring revenue base from contracted accounts.'}
+        ]);
+
+      } else if(b.key==='fab'){
+        // FAB breakdown by channel × top products
+        const chRows=[], prodAgg={};
+        activeChs.forEach((ch,ci)=>{
+          const chTotal=Object.values(fabMoData[ch]||{}).reduce((a,v)=>a+v,0);
+          if(chTotal>0){
+            chRows.push({
+              label:ch.replace('Sales Channel ','Ch '),dot:CH_COLORS[ci],
+              values:[fmtBn(chTotal),(chTotal/fabData.total*100).toFixed(0)+'%'],
+              bar:{val:chTotal,max:fabData.total,color:CH_COLORS[ci]}
+            });
+            Object.entries(fabMoData[ch]||{}).forEach(([pr,v])=>prodAgg[pr]=(prodAgg[pr]||0)+v);
+          }
+        });
+        const topProds=Object.entries(prodAgg).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([pr,v],pi)=>({
+          label:pr,dot:PR_COLORS[pi],
+          values:[fmtBn(v),(v/fabData.total*100).toFixed(0)+'%'],
+          bar:{val:v,max:fabData.total,color:PR_COLORS[pi]}
+        }));
+        const totRow={label:'TOTAL',values:[fmtBn(fabData.total),'100%'],colors:['#FFCB05','rgba(255,255,255,0.4)'],isTotal:true};
+        html=ttTable('FAB Upside',b.color,[
+          {heading:'BY CHANNEL',headers:['Channel','Revenue','Share'],rows:[...chRows,totRow]},
+          {heading:'TOP PRODUCTS',headers:['Product','Revenue','Share'],rows:topProds},
+          {note:'In-month upside revenue from FAB database.'}
+        ]);
+
+      } else if(b.key==='sfa_c'){
+        // SFA Completed breakdown by channel + top products
+        const compByProd={}, compByCh={};
+        activeChs.forEach(ch=>{ let cv=0; activePrs.forEach(pr=>{ const v=SFA[ch]?.[pr]?.[moNum]?.['6. Complete']||0; cv+=v; compByProd[pr]=(compByProd[pr]||0)+v; }); compByCh[ch]=cv; });
+        const compTotal=Object.values(compByCh).reduce((a,v)=>a+v,0);
+        const chRows=activeChs.map((ch,ci)=>compByCh[ch]>0?{
+          label:ch.replace('Sales Channel ','Ch '),dot:CH_COLORS[ci],
+          values:[fmtMn(compByCh[ch]),(compByCh[ch]/compTotal*100).toFixed(0)+'%'],
+          bar:{val:compByCh[ch],max:compTotal,color:CH_COLORS[ci]}
+        }:null).filter(Boolean);
+        const prRows=Object.entries(compByProd).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([pr,v],pi)=>({
+          label:pr,dot:PR_COLORS[pi],
+          values:[fmtMn(v),(v/compTotal*100).toFixed(0)+'%'],
+          bar:{val:v,max:compTotal,color:PR_COLORS[pi]}
+        }));
+        html=ttTable('SFA Completed (Stage 6)',b.color,[
+          {heading:'BY CHANNEL',headers:['Channel','MRC','Share'],rows:[...chRows,{label:'TOTAL',values:[fmtMn(compTotal),'100%'],colors:['#FFCB05','rgba(255,255,255,0.4)'],isTotal:true}]},
+          {heading:'TOP PRODUCTS',headers:['Product','MRC','Share'],rows:prRows},
+          {note:'Deals at Stage 6 (Complete/Won) with confirmed MRC.'}
+        ]);
+
+      } else if(b.key==='sfa_p'){
+        // SFA Pipeline (stages 1–5) breakdown by stage + channel
+        const stageData=STAGES.slice(0,5).map((st,si)=>{
+          let v=0; activeChs.forEach(ch=>activePrs.forEach(pr=>{v+=(SFA[ch]?.[pr]?.[moNum]?.[st])||0;}));
+          return{st,v,c:['#9B9A96','#FFCB05','#32BCAD','#C6168D','#ED1C24'][si]};
+        });
+        const pipeTotal=stageData.reduce((s,r)=>s+r.v,0);
+        const stRows=stageData.filter(r=>r.v>0).map(r=>({
+          label:r.st,dot:r.c,
+          values:[fmtMn(r.v),(r.v/pipeTotal*100).toFixed(0)+'%'],
+          bar:{val:r.v,max:pipeTotal,color:r.c}
+        }));
+        // by product
+        const pByProd={};
+        activeChs.forEach(ch=>STAGES.slice(0,5).forEach(st=>activePrs.forEach(pr=>{const v=(SFA[ch]?.[pr]?.[moNum]?.[st])||0;if(v>0)pByProd[pr]=(pByProd[pr]||0)+v;})));
+        const prRows=Object.entries(pByProd).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([pr,v],pi)=>({
+          label:pr,dot:PR_COLORS[pi],
+          values:[fmtMn(v),(v/pipeTotal*100).toFixed(0)+'%'],
+          bar:{val:v,max:pipeTotal,color:PR_COLORS[pi]}
+        }));
+        html=ttTable('SFA Active Pipeline (Stages 1–5)',b.color,[
+          {heading:'BY STAGE',headers:['Stage','MRC','Share'],rows:[...stRows,{label:'TOTAL',values:[fmtMn(pipeTotal),'100%'],colors:['#FFCB05','rgba(255,255,255,0.4)'],isTotal:true}]},
+          {heading:'BY PRODUCT',headers:['Product','MRC','Share'],rows:prRows},
+          {note:'Active deals not yet closed. Higher stages = closer to conversion.'}
+        ]);
+
+      } else if(b.key==='fc'){
+        const attainPct=(fcTotal/target*100).toFixed(1);
+        html=ttTable(month+' Forecast Total',b.color,[
+          {heading:'COMPOSITION (IDR Bn)',headers:['Component','Value','% of FC'],rows:[
+            {label:'Baseline MRC',dot:'#4D4D4F',values:[base+'B',(base/fcTotal*100).toFixed(1)+'%'],bar:{val:base,max:fcTotal,color:'#4D4D4F'}},
+            {label:'FAB Upside',dot:'#32BCAD',values:[fab+'B',(fab/fcTotal*100).toFixed(1)+'%'],bar:{val:fab,max:fcTotal,color:'#32BCAD'}},
+            {label:'SFA Complete',dot:'#EC008C',values:[d.sfa_complete_mn+'M',(sfc/fcTotal*100).toFixed(1)+'%'],bar:{val:sfc,max:fcTotal,color:'#EC008C'}},
+            {label:'SFA Pipeline',dot:'#C6168D',values:[d.sfa_pipe_mn+'M',(sfp/fcTotal*100).toFixed(1)+'%'],bar:{val:sfp,max:fcTotal,color:'#C6168D'}},
+            {label:'FC TOTAL',values:[fcTotal.toFixed(2)+'B','100%'],colors:['#FFCB05','rgba(255,255,255,0.4)'],isTotal:true},
+          ]},
+          {heading:'VS TARGET',headers:['Metric','Value'],rows:[
+            {label:'Target',values:[target+'B'],colors:['rgba(255,255,255,0.7)']},
+            {label:'Gap',values:[(gap>0?'+':'')+gap.toFixed(2)+'B'],colors:[gap>=0?'#32BCAD':'#ED1C24']},
+            {label:'Attainment',values:[attainPct+'%'],colors:[parseFloat(attainPct)>=100?'#32BCAD':'#FFCB05']},
+          ]},
+        ]);
+
+      } else if(b.key==='target'){
+        const attainPct=(fcTotal/target*100).toFixed(1);
+        const gapColor=gap>=0?'#32BCAD':'#ED1C24';
+        html=ttTable(month+' Target',b.color,[
+          {heading:'TARGET DETAILS',headers:['Metric','Value'],rows:[
+            {label:'Target (IDR Bn)',values:[target+'B'],colors:['#FFCB05']},
+            {label:'Forecast Total',values:[fcTotal.toFixed(2)+'B'],colors:['rgba(255,255,255,0.7)']},
+            {label:'Gap',values:[(gap>0?'+':'')+gap.toFixed(2)+'B'],colors:[gapColor]},
+            {label:'Attainment',values:[attainPct+'%'],colors:[gapColor],isTotal:true},
+          ]},
+          {note: gap<0
+            ? `Shortfall of ${Math.abs(gap).toFixed(2)}B. Additional pipeline needed to close gap.`
+            : `Target exceeded by ${gap.toFixed(2)}B. 🎯`}
+        ]);
+      }
+
+      ttShow(html,e);
+    });
+    gEl.addEventListener('mouseleave',()=>{ document.querySelectorAll('.wf-bar-group').forEach(g=>g.classList.remove('dimmed')); ttHide(); });
+    gEl.addEventListener('mousemove',ttMove);
+  });
+}
+
+/* ═══ FORMAT HELPERS ═══ */
+function fmt(v){
+  if(v>=1e9) return (v/1e9).toFixed(2)+'B';
+  if(v>=1e6) return (v/1e6).toFixed(1)+'M';
+  if(v>=1e3) return (v/1e3).toFixed(0)+'K';
+  return v.toFixed(0);
+
+}
+function fmtBn(v){return(v/1e9).toFixed(2)+'B'}
+function fmtMn(v){return v===0?'–':(v/1e6).toFixed(1)+'M'}
+function fmtK(v){return v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v.toFixed(0)}
+function pct(a,b){return b>0?(a/b*100).toFixed(0):0}
+
+/* ═══ ACCOUNT PIPELINE TABLE DATA ═══ */
+const ACCT_DATA = {
+  recent_win: {
+    title: "Recent Win",
+    period: "Apr' 26",
+    accounts: [
+      { num:1,  name:"AKUL***KU",           service:"Device – IOT Smart Manufacturing", tcv:0.5,  apr:0.1,  may:null, jun:null, remark:"On Track Delivery",       remarkType:"green"  },
+      { num:2,  name:"ARTA***********S PT",  service:"CCTV AI Solution",                tcv:1.5,  apr:1.1,  may:null, jun:null, remark:"On Track Delivery",       remarkType:"green"  },
+      { num:3,  name:"BADA***********TASI",  service:"Monitoring Dashboard",            tcv:0.3,  apr:0.3,  may:null, jun:null, remark:"Complete",                 remarkType:"teal"   },
+      { num:4,  name:"MAND***********TARA",  service:"Enterprise Mobility Suite",       tcv:2.1,  apr:2.1,  may:null, jun:null, remark:"Complete",                 remarkType:"teal"   },
+      { num:5,  name:"TRAN***ARTA",          service:"Fixed Data Connectivity",         tcv:0.8,  apr:0.8,  may:null, jun:null, remark:"On Track Delivery",       remarkType:"green"  },
+      { num:6,  name:"PERT***OKAN",          service:"ICT Managed Services",            tcv:1.2,  apr:0.9,  may:null, jun:null, remark:"Partial Delivery",        remarkType:"yellow" },
+      { num:7,  name:"SOLU***TBK",           service:"Mobile Bulk – Fleet",             tcv:0.6,  apr:0.6,  may:null, jun:null, remark:"Complete",                 remarkType:"teal"   },
+      { num:8,  name:"GLOB***RIMA",          service:"M2M SIM Management",              tcv:0.4,  apr:0.4,  may:null, jun:null, remark:"Complete",                 remarkType:"teal"   },
+      { num:9,  name:"BANK***ASIA",          service:"IOT Asset Tracking",              tcv:0.9,  apr:0.7,  may:null, jun:null, remark:"Awaiting BG Release",     remarkType:"blue"   },
+      { num:10, name:"INTR***LUSI",          service:"Data Center Colocation",          tcv:3.2,  apr:3.2,  may:null, jun:null, remark:"Complete",                 remarkType:"teal"   },
+      { num:11, name:"SINO***ESIA",          service:"Cloud Connectivity – SD-WAN",     tcv:1.7,  apr:1.7,  may:null, jun:null, remark:"On Track Delivery",       remarkType:"green"  },
+      { num:12, name:"Others",               service:"",                                tcv:20.5, apr:21.1, may:null, jun:null, remark:"Other Upside",             remarkType:"gray",  isOthers:true },
+    ]
+  },
+  pipeline_may: {
+    title: "Pipeline",
+    period: "May' 26",
+    accounts: [
+      { num:1,  name:"INDO**********BILE",   service:"Meta RCS",                        tcv:0.1,  apr:null, may:0.1,  jun:null, remark:"Awaiting PO",             remarkType:"yellow" },
+      { num:2,  name:"GLOB*********IAGA",    service:"Bulk Service",                    tcv:0.2,  apr:null, may:0.3,  jun:null, remark:"Waiting Inject",          remarkType:"blue"   },
+      { num:3,  name:"PERT*******SERO",      service:"Data Monetization",               tcv:0.1,  apr:null, may:0.1,  jun:null, remark:"Awaiting PO",             remarkType:"yellow" },
+      { num:4,  name:"KILA***ONAL",          service:"IOT Smart City",                  tcv:0.5,  apr:null, may:0.5,  jun:null, remark:"Contract Review",         remarkType:"blue"   },
+      { num:5,  name:"MEGA***SADA",          service:"Fixed Data Enterprise",           tcv:0.3,  apr:null, may:0.3,  jun:null, remark:"Awaiting PO",             remarkType:"yellow" },
+      { num:6,  name:"NETZ***ESIA",          service:"M2M Fleet Tracking",              tcv:0.2,  apr:null, may:0.2,  jun:null, remark:"Technical Validation",    remarkType:"blue"   },
+      { num:7,  name:"STAR***ICES",          service:"Fixed Data Broadband",            tcv:0.4,  apr:null, may:0.3,  jun:null, remark:"Waiting Inject",          remarkType:"blue"   },
+      { num:8,  name:"PDAM***EPOK",          service:"Smart Meter M2M",                 tcv:0.1,  apr:null, may:0.1,  jun:null, remark:"Awaiting PO",             remarkType:"yellow" },
+    ]
+  },
+  long_term: {
+    title: "Long-Term Pipeline",
+    period: "",
+    accounts: [
+      { num:1,  name:"MULT*********NGSA",    service:"Additional LCU to 14K",           tcv:12.1, apr:null, may:null, jun:5.0,  remark:"Forecasted – completed delivery accrual", remarkType:"blue"   },
+      { num:2,  name:"BPR ******BANG",       service:"Data Warehouse",                  tcv:6.4,  apr:null, may:null, jun:6.4,  remark:"PO received, waiting for BG",             remarkType:"green"  },
+      { num:3,  name:"DISK*******ANAN",      service:"Tower SST 3 BTS",                 tcv:4.5,  apr:null, may:null, jun:2.9,  remark:"Awaiting Tower Construction",             remarkType:"yellow" },
+      { num:4,  name:"BADA*****STIK",        service:"Data Analytics Platform",         tcv:3.0,  apr:null, may:null, jun:1.5,  remark:"Proposal Submitted",                      remarkType:"blue"   },
+      { num:5,  name:"KERE***SERO",          service:"ICT Network Upgrade",             tcv:2.8,  apr:null, may:null, jun:null, remark:"Early Negotiation",                        remarkType:"gray"   },
+      { num:6,  name:"UNIV***ESIA",          service:"Campus IOT Deployment",           tcv:1.9,  apr:null, may:null, jun:null, remark:"RFP Stage",                                remarkType:"yellow" },
+      { num:7,  name:"MODA***ARTA",          service:"Hybrid Cloud ICT",                tcv:3.5,  apr:null, may:null, jun:null, remark:"Scoping in Progress",                      remarkType:"gray"   },
+      { num:8,  name:"PETR***ESIA",          service:"Fixed Voice MPLS",                tcv:2.1,  apr:null, may:null, jun:null, remark:"Awaiting Budget Approval",                 remarkType:"yellow" },
+      { num:9,  name:"LINT***TARA",          service:"SD-WAN Enterprise",               tcv:5.8,  apr:null, may:null, jun:null, remark:"Technical Workshop Done",                  remarkType:"blue"   },
+    ]
+  }
+};
+
+/* ═══ BUILD ACCOUNT TABLES ═══ */
+function boldMasked(name){
+  // Bold the visible chars, style the asterisks dimmer
+  return name.replace(/(\*+)/g, '<span style="color:var(--t3);font-weight:400">$1</span>');
+}
+
+function numCell(v){
+  if(v===null||v===undefined) return `<td class="dash">–</td>`;
+  return `<td class="num">${v.toFixed(1)}</td>`;
+}
+
+function remarkBadge(text, type){
+  const cls = {green:'remark-green',blue:'remark-blue',yellow:'remark-yellow',gray:'remark-gray',red:'remark-red',teal:'remark-teal'}[type]||'remark-gray';
+  return `<span class="remark-chip ${cls}">${text}</span>`;
+}
+
+function buildAccountTables(){
+  const panels = Object.values(ACCT_DATA);
+  const ROWS_BEFORE_SCROLL = 5; // show this many rows before panel scrolls
+
+  document.getElementById('acct-grid').innerHTML = panels.map(panel => {
+    const count = panel.accounts.length;
+    const needsScroll = count > ROWS_BEFORE_SCROLL;
+    const periodLabel = panel.period ? ` <span>(${panel.period})</span>` : '';
+    const countBadge  = count > 0 ? `<span class="acct-count">${count}</span>` : '';
+
+    const rows = panel.accounts.map(a => {
+      const trClass = a.isOthers ? ' class="acct-others"' : '';
+      return `<tr${trClass}>
+        <td class="row-num">${a.num}</td>
+        <td>
+          <div class="acct-name">${boldMasked(a.name)}</div>
+          ${a.service ? `<div class="acct-service">${a.service}</div>` : ''}
+        </td>
+        ${numCell(a.tcv)}
+        ${numCell(a.apr)}
+        ${numCell(a.may)}
+        ${numCell(a.jun)}
+        <td style="max-width:130px">${remarkBadge(a.remark, a.remarkType)}</td>
+      </tr>`;
+    }).join('');
+
+    return `
+    <div class="acct-panel${needsScroll ? ' is-scrollable' : ''}">
+      <div class="acct-panel-hdr">
+        <h3>${panel.title}${periodLabel}${countBadge}</h3>
+      </div>
+      <div class="acct-scroll">
+        <table class="acct-tbl">
+          <thead>
+            <tr>
+              <th rowspan="2">#</th>
+              <th rowspan="2">Account<br>&amp; Service <span style="font-weight:400;color:var(--t3)">(OTC/MRC)</span></th>
+              <th colspan="4" class="num" style="text-align:center;border-left:1px solid rgba(237,28,36,0.1)">Revenue (IDR Bn)</th>
+              <th rowspan="2">Confidence &amp;<br>Remarks</th>
+            </tr>
+            <tr>
+              <th class="num" style="border-left:1px solid rgba(237,28,36,0.1)">TCV</th>
+              <th class="num">Apr</th>
+              <th class="num">May</th>
+              <th class="num">Jun</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══ UPDATE ALL ═══ */
+function updateAll(){
+  const p=document.getElementById('f-period').value;
+  const c=document.getElementById('f-channel').value;
+  const pr=document.getElementById('f-product').value;
+  activePeriod=p; activeChannel=c; activeProduct=pr;
+  document.getElementById('sub-label').textContent=`As per Apr 27, 2026 · ${c} · ${pr==='All'?'All Products':pr} · ${MO_LABEL_MAP[p]}`;
+  buildKPIs();
+  buildFunnel();
+  buildTrend();
+  buildChannelChart();
+  buildProductChart();
+  buildFABChart();
+  buildFABProductChart();
+  buildFABTable();
+  buildProductTable();
+  buildWaterfall(activeWFMonth);
+  buildAccountTables();
+}
+
+/* Waterfall tabs */
+document.querySelectorAll('#wf-tabs .tab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#wf-tabs .tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    activeWFMonth=btn.dataset.m;
+    buildWaterfall(activeWFMonth);
+  });
+});
+
+['f-period','f-channel','f-product'].forEach(id=>
+  document.getElementById(id).addEventListener('change',updateAll)
+);
+
+updateAll();
 </script>
-
-
-</body></html>
+</body>
+</html>
